@@ -153,7 +153,7 @@
   </div>
 
   <ExportMetricModal></ExportMetricModal>
-  <AddMetricModal></AddMetricModal>
+  <AddMetricModal :tableData="tableData"></AddMetricModal>
 </template>
 
 <script lang="ts">
@@ -162,7 +162,7 @@ import { defineComponent, onMounted, ref } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
 import ExportMetricModal from "@/components/modals/forms/ExportMetricModal.vue";
-import AddMetricModal from "@/components/modals/forms/AddMetricModal.vue";
+import AddMetricModal from "@/views/apps/metrics/AddMetricModal.vue";
 import type { IMetric } from "@/core/data/metrics";
 import arraySort from "array-sort";
 import { MenuComponent } from "@/assets/ts/components";
