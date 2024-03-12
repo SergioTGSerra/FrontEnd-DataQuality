@@ -34,6 +34,14 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
+        path: "/metrics",
+        name: "metrics",
+        component: () => import("@/views/apps/metrics/MetricsListing.vue"),
+        meta: {
+          pageTitle: "Metrics",
+        },
+      },  
+      {
         path: "/crafted/pages/profile",
         name: "profile",
         component: () => import("@/components/page-layouts/Profile.vue"),

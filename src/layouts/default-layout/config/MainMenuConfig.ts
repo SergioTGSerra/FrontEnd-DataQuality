@@ -15,6 +15,12 @@ const MainMenuConfig: Array<MenuItem> = [
         keenthemesIcon: "switch",
         bootstrapIcon: "bi-layers",
       },
+      {
+        heading: "metrics",
+        route: "/metrics",
+        keenthemesIcon: "element-11",
+        bootstrapIcon: "bi-app-indicator",
+      },
     ],
   },
   {
