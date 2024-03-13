@@ -40,6 +40,14 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           pageTitle: "Metrics",
         },
+      },
+      {
+        path: "/productionActivities",
+        name: "production Activity",
+        component: () => import("@/views/apps/productionActivities/productionActivitiesListing.vue"),
+        meta: {
+          pageTitle: "Production Activity",
+        },
       },  
       {
         path: "/crafted/pages/profile",
