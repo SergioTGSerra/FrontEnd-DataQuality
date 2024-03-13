@@ -131,11 +131,15 @@
           >
             <!--begin::Menu item-->
             <div class="menu-item px-3">
-              <router-link
-                to="/apps/metrics/metric-details"
+              <a
+                @click="editMetric(metric)"
+                href="#"
+                data-bs-toggle="modal"
+                data-bs-target="#kt_modal_edit_metric"
                 class="menu-link px-3"
-                >View</router-link
+                >Edit</a
               >
+                            
             </div>
             <!--end::Menu item-->
             <!--begin::Menu item-->
@@ -154,6 +158,7 @@
 
   <ExportMetricModal></ExportMetricModal>
   <AddMetricModal :tableData="tableData"></AddMetricModal>
+  <EditMetricModal :metric="metric"></EditMetricModal>
 </template>
 
 <script lang="ts">
@@ -163,6 +168,7 @@ import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
 import ExportMetricModal from "@/components/modals/forms/ExportMetricModal.vue";
 import AddMetricModal from "@/views/apps/metrics/AddMetricModal.vue";
+import EditMetricModal from "./EditMetricModal.vue";
 import type { IMetric } from "@/core/data/metrics";
 import arraySort from "array-sort";
 import { MenuComponent } from "@/assets/ts/components";
@@ -177,8 +183,10 @@ export default defineComponent({
     Datatable,
     ExportMetricModal,
     AddMetricModal,
+    EditMetricModal,
   },
   setup() {
+    
     const tableHeader = ref([
       {
         columnName: "Name",
@@ -208,11 +216,18 @@ export default defineComponent({
     const selectedIds = ref<Array<number>>([]);
 
     const tableData = ref<Array<IMetric>>(metrics);
+    const metric = ref<Object>([]);
     const initMetrics = ref<Array<IMetric>>([]);
 
     onMounted(() => {
       initMetrics.value.splice(0, tableData.value.length, ...tableData.value);
     });
+
+    const editMetric = (metricI: IMetric) => {
+      metric.value = metricI;
+      console.log("metric", metric.value);
+      //defineProps({metricI: Array});
+    };
 
     const deleteFewMetrics = () => {
       selectedIds.value.forEach((item) => {
@@ -277,6 +292,8 @@ export default defineComponent({
       sort,
       onItemSelect,
       getAssetPath,
+      editMetric,
+      metric
     };
   },
 });
