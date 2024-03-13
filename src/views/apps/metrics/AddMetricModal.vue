@@ -203,8 +203,10 @@ export default defineComponent({
               },
             }).then(() => {
               hideModal(addMetricModalRef.value);
-              ApiService.post("/metric", formData.value);
-              props.tableData?.push(formData.value);
+              (async () => {
+                const response = await ApiService.post("/metric", formData.value);
+                props.tableData?.push(response.data.data);
+              })();
             });
           }, 2000);
         } else {
