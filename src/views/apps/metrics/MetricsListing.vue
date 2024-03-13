@@ -161,7 +161,6 @@
 </template>
 
 <script lang="ts">
-import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
@@ -172,6 +171,7 @@ import type { IMetric } from "@/core/data/metrics";
 import arraySort from "array-sort";
 import { MenuComponent } from "@/assets/ts/components";
 import ApiService from "@/core/services/ApiService";
+import Swal from "sweetalert2";
 
 const response = await ApiService.get("/metric");
 const metrics = response.data.data;
@@ -212,7 +212,6 @@ export default defineComponent({
       },
     ]);
     const selectedIds = ref<Array<number>>([]);
-
     const tableData = ref<Array<IMetric>>(metrics);
     const metric = ref<Object>([]);
     const initMetrics = ref<Array<IMetric>>([]);
@@ -225,20 +224,44 @@ export default defineComponent({
       metric.value = metricI;
     };
 
+    const deleteModalConfirmation = (id?: any) => {
+      Swal.fire({
+          title: "Are you sure?",
+          text: "You won't be able to revert this!",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Yes, delete them all!",
+          cancelButtonText: "No, cancel!",
+          customClass: {
+            confirmButton: "btn btn-primary",
+            cancelButton: "btn btn-active-light-primary",
+          },
+        }).then((result) => {
+          if (result.isConfirmed) {
+
+            if (selectedIds.value.length > 0){
+              selectedIds.value.forEach((item) => {
+                ApiService.delete(`/metric/${item}`);
+                tableData.value = tableData.value.filter((metric) => metric.id !== item.toString());
+              });
+              selectedIds.value.length = 0;
+            }else{
+              ApiService.delete(`/metric/${id}`);
+              tableData.value = tableData.value.filter((metric) => metric.id !== id.toString());
+            }
+            Swal.fire("Deleted!", "Your files have been deleted.", "success");
+          } else if (result.dismiss === Swal.DismissReason.cancel) {
+            Swal.fire("Cancelled", "Your files are safe :)", "error");
+          }
+        });
+    }
+
     const deleteFewMetrics = () => {
-      selectedIds.value.forEach((item) => {
-        deleteMetric(item);
-      });
-      selectedIds.value.length = 0;
+      deleteModalConfirmation();
     };
 
     const deleteMetric = (id: number) => {
-      for (let i = 0; i < tableData.value.length; i++) {
-        if (tableData.value[i].id === id.toString()) {
-          tableData.value.splice(i, 1);
-          ApiService.delete(`/metric/${id}`);
-        }
-      }
+      deleteModalConfirmation(id);
     };
 
     const search = ref<string>("");
@@ -273,6 +296,7 @@ export default defineComponent({
         arraySort(tableData.value, sort.label, { reverse });
       }
     };
+
     const onItemSelect = (selectedItems: Array<number>) => {
       selectedIds.value = selectedItems;
     };
@@ -287,7 +311,6 @@ export default defineComponent({
       deleteFewMetrics,
       sort,
       onItemSelect,
-      getAssetPath,
       editMetric,
       metric
     };

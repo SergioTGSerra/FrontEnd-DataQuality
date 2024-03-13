@@ -147,10 +147,8 @@
 </template>
 
 <script lang="ts">
-import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, ref } from "vue";
 import { hideModal } from "@/core/helpers/modal";
-import { countries } from "@/core/data/countries";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import ApiService from "@/core/services/ApiService";
 
@@ -175,6 +173,30 @@ export default defineComponent({
         {
           required: true,
           message: "Metric name is required",
+          trigger: "change",
+        },
+        {
+          min: 2,
+          message: "Metric name must be at least 2 characters",
+          trigger: "change",
+        },
+      ],
+      description: [
+        {
+          required: true,
+          message: "Metric description is required",
+          trigger: "change",
+        },
+        {
+          min: 3,
+          message: "Metric description must be at least 3 characters",
+          trigger: "change",
+        },
+      ],
+      unit: [
+        {
+          required: true,
+          message: "Metric unit is required",
           trigger: "change",
         },
       ],
@@ -230,8 +252,6 @@ export default defineComponent({
       formRef,
       loading,
       addMetricModalRef,
-      getAssetPath,
-      countries,
     };
   },
 });

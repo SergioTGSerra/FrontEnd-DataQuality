@@ -147,7 +147,6 @@
 </template>
 
 <script lang="ts">
-import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, ref, watch } from "vue";
 import { hideModal } from "@/core/helpers/modal";
 import Swal from "sweetalert2/dist/sweetalert2.js";
@@ -169,14 +168,14 @@ export default defineComponent({
       unit: "",
     });
 
-    watch(() => props.metric, (newMetric) => {
-      if (newMetric) {
+    watch(() => props.metric, (editMetric) => {
+      if (editMetric) {
         formData.value = {
-          name: newMetric.name,
-          description: newMetric.description,
-          unit: newMetric.unit,
+          name: editMetric.name,
+          description: editMetric.description,
+          unit: editMetric.unit,
         };
-      metricID = newMetric.id;
+      metricID = editMetric.id;
       }
     });
 
@@ -187,6 +186,11 @@ export default defineComponent({
           message: "Metric name is required",
           trigger: "change",
         },
+        {
+          min: 2,
+          message: "Metric name must be at least 2 characters",
+          trigger: "change",
+        }
       ],
       description: [
         {
@@ -194,6 +198,11 @@ export default defineComponent({
           message: "Metric description is required",
           trigger: "change",
         },
+        {
+          min: 2,
+          message: "Metric description must be at least 2 characters",
+          trigger: "change",
+        }
       ],
       unit: [
         {
@@ -208,7 +217,7 @@ export default defineComponent({
       const index = props.tableData.findIndex((item: any) => item.id === metricID);
       
       if (index !== -1) {
-        props.tableData[index] = metric.value;
+        props.tableData[index] = metric;
       }
     };
 
@@ -233,10 +242,10 @@ export default defineComponent({
               customClass: {
                 confirmButton: "btn btn-primary",
               },
-            }).then(() => {
+            }).then(async () => {
               hideModal(editMetricModalRef.value);
-              ApiService.put("/metric/" + metricID, formData.value);
-              updateMetric(formData);
+              const res = await ApiService.put("/metric/" + metricID, formData.value);
+              updateMetric(res.data.data);
             });
           }, 2000);
         } else {
@@ -262,7 +271,6 @@ export default defineComponent({
       formRef,
       loading,
       editMetricModalRef,
-      getAssetPath,
     };
   },
 });
