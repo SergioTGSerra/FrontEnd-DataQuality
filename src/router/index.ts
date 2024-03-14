@@ -50,6 +50,14 @@ const routes: Array<RouteRecordRaw> = [
         },
       },  
       {
+        path: "/organizations",
+        name: "organization",
+        component: () => import("@/views/apps/organizations/OrganizationsListing.vue"),
+        meta: {
+          pageTitle: "Organizations",
+        },
+      },  
+      {
         path: "/crafted/pages/profile",
         name: "profile",
         component: () => import("@/components/page-layouts/Profile.vue"),
