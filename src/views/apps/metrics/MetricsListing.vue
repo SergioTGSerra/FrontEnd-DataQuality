@@ -99,11 +99,14 @@
       <Datatable
         @on-sort="sort"
         @on-items-select="onItemSelect"
+        @page-change="currentPage"
+        @on-items-per-page-change="itemsPerPage"
         :data="tableData"
         :header="tableHeader"
         :enable-items-per-page-dropdown="true"
         :checkbox-enabled="true"
         checkbox-label="id"
+        :totalItems="totalItems"
       >
         <template v-slot:name="{ row: metric }">
           {{ metric.name }}
@@ -175,6 +178,7 @@ import Swal from "sweetalert2";
 
 const response = await ApiService.get("/metric");
 const metrics = response.data.data;
+const totalItems = response.data.totalElements; 
 
 export default defineComponent({
   name: "metrics-listing",
@@ -215,10 +219,33 @@ export default defineComponent({
     const tableData = ref<Array<IMetric>>(metrics);
     const metric = ref<Object>([]);
     const initMetrics = ref<Array<IMetric>>([]);
+    let current_page = ref<number>(0);
+    let items_per_page = ref<number>(10);
 
     onMounted(() => {
       initMetrics.value.splice(0, tableData.value.length, ...tableData.value);
     });
+
+    const getMetrics = async (current_page_param: number, items_per_page_param: number) => {
+      if(items_per_page.value !== items_per_page_param){
+        const response = await ApiService.get("metric?page=0&items_per_page=" + items_per_page_param);
+        tableData.value = response.data.data;
+      }else{
+        const response = await ApiService.get("metric?page=" + current_page_param + "&items_per_page=" + items_per_page_param);
+        tableData.value = response.data.data;
+      }
+    };
+
+    const currentPage = (page: any) => {
+      page = page - 1;
+      getMetrics(page, items_per_page.value);
+      current_page.value = page;
+    };
+
+    const itemsPerPage = (items: any) => {
+      getMetrics(current_page.value, items);
+      items_per_page.value = items;
+    };
 
     const editMetric = (metricI: IMetric) => {
       metric.value = metricI;
@@ -312,7 +339,10 @@ export default defineComponent({
       sort,
       onItemSelect,
       editMetric,
-      metric
+      metric,
+      currentPage,
+      itemsPerPage,
+      totalItems,
     };
   },
 });
