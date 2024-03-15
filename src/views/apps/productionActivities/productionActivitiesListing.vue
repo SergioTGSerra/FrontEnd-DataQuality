@@ -99,11 +99,14 @@
       <Datatable
         @on-sort="sort"
         @on-items-select="onItemSelect"
+        @page-change="currentPage"
+        @on-items-per-page-change="itemsPerPage"
         :data="tableData"
         :header="tableHeader"
         :enable-items-per-page-dropdown="true"
         :checkbox-enabled="true"
         checkbox-label="id"
+        :totalItems="totalItems"
       >
         <template v-slot:name="{ row: productionActivity }">
           {{ productionActivity.name }}
@@ -172,6 +175,7 @@ import Swal from "sweetalert2";
 
 const response = await ApiService.get("/production-activity");
 const productionActivities = response.data.data;
+const totalItems = response.data.totalElements;
 
 export default defineComponent({
   name: "productionActivities-listing",
@@ -206,6 +210,8 @@ export default defineComponent({
     const tableData = ref<Array<IProductionActivity>>(productionActivities);
     const productionActivity = ref<Object>([]);
     const initProductionActivities = ref<Array<IProductionActivity>>([]);
+    let current_page = ref<number>(0);
+    let items_per_page = ref<number>(10);
 
     onMounted(() => {
       initProductionActivities.value.splice(0, tableData.value.length, ...tableData.value);
@@ -213,6 +219,27 @@ export default defineComponent({
 
     const editProductionActivity = (ProductionActivityI: IProductionActivity) => {
       productionActivity.value = ProductionActivityI;
+    };
+
+    const getProductActivities = async (current_page_param: number, items_per_page_param: number) => {
+      if(items_per_page.value !== items_per_page_param){
+        const response = await ApiService.get("production-activity?page=0&items_per_page=" + items_per_page_param);
+        tableData.value = response.data.data;
+      }else{
+        const response = await ApiService.get("production-activity?page=" + current_page_param + "&items_per_page=" + items_per_page_param);
+        tableData.value = response.data.data;
+      }
+    };
+
+    const currentPage = (page: any) => {
+      page = page - 1;
+      getProductActivities(page, items_per_page.value);
+      current_page.value = page;
+    };
+
+    const itemsPerPage = (items: any) => {
+      getProductActivities(current_page.value, items);
+      items_per_page.value = items;
     };
 
     const deleteModalConfirmation = (id?: any) => {
@@ -304,6 +331,9 @@ export default defineComponent({
       onItemSelect,
       editProductionActivity,
       productionActivity,
+      currentPage,
+      itemsPerPage,
+      totalItems,
     };
   },
 });
