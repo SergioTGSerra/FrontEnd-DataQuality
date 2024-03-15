@@ -45,7 +45,7 @@ export default defineComponent({
     },
     checkboxEnabled: { type: Boolean, required: false, default: false },
     checkboxLabel: { type: String, required: false, default: "id" },
-    total: { type: Number, required: false },
+    totalItems: { type: Number, required: false },
     loading: { type: Boolean, required: false, default: false },
     sortLabel: { type: String, required: false, default: null },
     sortOrder: {
@@ -69,6 +69,7 @@ export default defineComponent({
   setup(props, { emit }) {
     const currentPage = ref(props.currentPage);
     const itemsInTable = ref<number>(props.itemsPerPage);
+    const totalItems = ref<number>(props.totalItems ?? 0);
 
     watch(
       () => itemsInTable.value,
@@ -93,17 +94,6 @@ export default defineComponent({
         }
       }
       return [];
-    });
-
-    const totalItems = computed(() => {
-      if (props.data) {
-        if (props.data.length <= itemsInTable.value) {
-          return props.total;
-        } else {
-          return props.data.length;
-        }
-      }
-      return 0;
     });
 
     const onSort = (sort: Sort) => {
