@@ -50,6 +50,14 @@ const routes: Array<RouteRecordRaw> = [
         },
       },  
       {
+        path: "/productionActivities/:id",
+        name: "production Activity Details",
+        component: () => import("@/views/apps/productionActivities/ProductionActivityDetails.vue"),
+        meta: {
+          pageTitle: "Production Activity Details",
+        },
+      }, 
+      {
         path: "/organizations",
         name: "organization",
         component: () => import("@/views/apps/organizations/OrganizationsListing.vue"),
