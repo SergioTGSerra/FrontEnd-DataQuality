@@ -73,6 +73,7 @@ const routes: Array<RouteRecordRaw> = [
           pageTitle: "Value Records",
         },
       },  
+      /*
       {
         path: "/crafted/pages/profile",
         name: "profile",
@@ -444,7 +445,7 @@ const routes: Array<RouteRecordRaw> = [
           pageTitle: "Feeds",
           breadcrumbs: ["Crafted", "Widgets"],
         },
-      },
+      },*/
     ],
   },
   {
