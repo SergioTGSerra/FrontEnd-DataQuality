@@ -131,7 +131,6 @@ import { defineComponent, ref, watch } from "vue";
 import { hideModal } from "@/core/helpers/modal";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import ApiService from "@/core/services/ApiService";
-import { reference } from "@popperjs/core";
 
 export default defineComponent({
   name: "edit-productionActivity-modal",

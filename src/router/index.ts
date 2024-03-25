@@ -50,6 +50,14 @@ const routes: Array<RouteRecordRaw> = [
         },
       },  
       {
+        path: "/productionActivities/:id",
+        name: "production Activity Details",
+        component: () => import("@/views/apps/productionActivities/ProductionActivityDetails.vue"),
+        meta: {
+          pageTitle: "Production Activity Details",
+        },
+      }, 
+      {
         path: "/organizations",
         name: "organization",
         component: () => import("@/views/apps/organizations/OrganizationsListing.vue"),
@@ -57,6 +65,15 @@ const routes: Array<RouteRecordRaw> = [
           pageTitle: "Organizations",
         },
       },  
+      {
+        path: "/valueRecords",
+        name: "Value Records",
+        component: () => import("@/views/apps/valueRecords/ValueRecordsListing.vue"),
+        meta: {
+          pageTitle: "Value Records",
+        },
+      },  
+      /*
       {
         path: "/crafted/pages/profile",
         name: "profile",
@@ -428,7 +445,7 @@ const routes: Array<RouteRecordRaw> = [
           pageTitle: "Feeds",
           breadcrumbs: ["Crafted", "Widgets"],
         },
-      },
+      },*/
     ],
   },
   {

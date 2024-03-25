@@ -14,7 +14,7 @@
             v-model="search"
             @input="searchItems()"
             class="form-control form-control-solid w-250px ps-15"
-            placeholder="Search Production Activity"
+            placeholder="Search Value Records"
           />
         </div>
         <!--end::Search-->
@@ -26,37 +26,37 @@
         <div
           v-if="selectedIds.length === 0"
           class="d-flex justify-content-end"
-          data-kt-productionActivity-table-toolbar="base"
+          data-kt-valueRecord-table-toolbar="base"
         >
           <!--begin::Export-->
-          <button
+          <!-- <button
             type="button"
             class="btn btn-light-primary me-3"
             data-bs-toggle="modal"
-            data-bs-target="#kt_productionActivities_export_modal"
+            data-bs-target="#kt_valueRecords_export_modal"
           >
             <KTIcon icon-name="exit-up" icon-class="fs-2" />
             Export
-          </button>
+          </button> -->
           <!--end::Export-->
-          <!--begin::Add productionActivity-->
+          <!--begin::Add valueRecord-->
           <button
             type="button"
             class="btn btn-primary"
             data-bs-toggle="modal"
-            data-bs-target="#kt_modal_add_productionActivity"
+            data-bs-target="#kt_modal_add_valueRecord"
           >
             <KTIcon icon-name="plus" icon-class="fs-2" />
-            Add Production Activity
+            Add Value Record
           </button>
-          <!--end::Add productionActivity-->
+          <!--end::Add valueRecord-->
         </div>
         <!--end::Toolbar-->
         <!--begin::Group actions-->
         <div
           v-else
           class="d-flex justify-content-end align-items-center"
-          data-kt-productionActivity-table-toolbar="selected"
+          data-kt-valueRecord-table-toolbar="selected"
         >
           <div class="fw-bold me-5">
             <span class="me-2">{{ selectedIds.length }}</span
@@ -65,7 +65,7 @@
           <button
             type="button"
             class="btn btn-danger"
-            @click="deleteFewProductionActivities()"
+            @click="deleteFewValueRecords()"
           >
             Delete Selected
           </button>
@@ -74,19 +74,19 @@
         <!--begin::Group actions-->
         <div
           class="d-flex justify-content-end align-items-center d-none"
-          data-kt-productionActivity-table-toolbar="selected"
+          data-kt-valueRecord-table-toolbar="selected"
         >
           <div class="fw-bold me-5">
             <span
               class="me-2"
-              data-kt-productionActivity-table-select="selected_count"
+              data-kt-valueRecord-table-select="selected_count"
             ></span
             >Selected
           </div>
           <button
             type="button"
             class="btn btn-danger"
-            data-kt-productionActivity-table-select="delete_selected"
+            data-kt-valueRecord-table-select="delete_selected"
           >
             Delete Selected
           </button>
@@ -108,13 +108,28 @@
         checkbox-label="id"
         :totalItems="totalItems"
       >
-        <template v-slot:name="{ row: productionActivity }">
-          {{ productionActivity.name }}
+        <template v-slot:value="{ row: valueRecord }">
+          {{ valueRecord.value }}
         </template>
-        <template v-slot:reference="{ row: productionActivity }">
-          {{ productionActivity.reference }}
+        <template v-slot:validityDegree="{ row: valueRecord }">
+            {{ valueRecord.validityDegree.toFixed(2) }}%
         </template>
-        <template v-slot:actions="{ row: productionActivity }">
+        <template v-slot:validityCategory="{ row: valueRecord }">
+          {{ valueRecord.validityCategory }}
+        </template>
+        <template v-slot:lotReference="{ row: valueRecord }">
+          {{ valueRecord.lotReference }}
+        </template>
+        <template v-slot:metric="{ row: valueRecord }">
+          {{ valueRecord.metric.name }}
+        </template>
+        <template v-slot:productionActivity="{ row: valueRecord }">
+          {{ valueRecord.productionActivity.name }}
+        </template>
+        <template v-slot:organization="{ row: valueRecord }">
+          {{ valueRecord.organization.name }}
+        </template>
+        <template v-slot:actions="{ row: valueRecord }">
           <a
             href="#"
             class="btn btn-sm btn-light btn-active-light-primary"
@@ -129,30 +144,9 @@
             class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-125px py-4"
             data-kt-menu="true"
           >
-
-            <div class="menu-item px-3">
-              <router-link
-                  :to="`/productionActivities/${productionActivity.id}`"
-                  class="menu-link px-3"
-                >
-                  View
-              </router-link>
-            </div>
             <!--begin::Menu item-->
             <div class="menu-item px-3">
-              <a
-                @click="editProductionActivity(productionActivity)"
-                data-bs-toggle="modal"
-                data-bs-target="#kt_modal_edit_productionActivity"
-                class="menu-link px-3"
-                >Edit</a
-              >
-                            
-            </div>
-            <!--end::Menu item-->
-            <!--begin::Menu item-->
-            <div class="menu-item px-3">
-              <a @click="deleteProductionActivity(productionActivity.id)" class="menu-link px-3"
+              <a @click="deleteValueRecord(valueRecord.id)" class="menu-link px-3"
                 >Delete</a
               >
             </div>
@@ -164,50 +158,75 @@
     </div>
   </div>
 
-  <ExportProductionActivityModal></ExportProductionActivityModal>
-  <AddProductionActivityModal :tableData="tableData"></AddProductionActivityModal>
-  <EditProductionActivityModal :productionActivity="productionActivity" :tableData="tableData"></EditProductionActivityModal>
+  <AddValueRecordModal :tableData="tableData"></AddValueRecordModal>
 </template>
 
 <script lang="ts">
 import { defineComponent, onMounted, ref } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
-import ExportProductionActivityModal from "@/components/modals/forms/ExportMetricModal.vue";
-import AddProductionActivityModal from "./AddProductionActivityModal.vue";
-import EditProductionActivityModal from "./EditProductionActivityModal.vue";
-import type { IProductionActivity } from "@/core/data/productionActivities";
+import AddValueRecordModal from "./AddValueRecordModal.vue";
 import arraySort from "array-sort";
 import { MenuComponent } from "@/assets/ts/components";
 import ApiService from "@/core/services/ApiService";
 import Swal from "sweetalert2";
+import type { IValueRecord } from "@/core/data/valueRecords";
 
-const response = await ApiService.get("/production-activity");
-const productionActivities = response.data.data;
-const totalItems = response.data.totalElements;
+const response = await ApiService.get("/value-record");
+const valueRecords = response.data.data;
+const totalItems = response.data.totalElements; 
 
 export default defineComponent({
-  name: "productionActivities-listing",
+  name: "valueRecords-listing",
   components: {
     Datatable,
-    ExportProductionActivityModal,
-    AddProductionActivityModal,
-    EditProductionActivityModal,
+    AddValueRecordModal,
   },
   setup() {
     const tableHeader = ref([
       {
-        columnName: "Name",
-        columnLabel: "name",
+        columnName: "Value",
+        columnLabel: "value",
         sortEnabled: true,
         columnWidth: 175,
       },
       {
-        columnName: "Reference",
-        columnLabel: "reference",
+        columnName: "Validity Degree",
+        columnLabel: "validityDegree",
         sortEnabled: true,
         columnWidth: 175,
       },
+      {
+        columnName: "Validity Category",
+        columnLabel: "validityCategory",
+        sortEnabled: true,
+        columnWidth: 175,
+      },
+      {
+        columnName: "Lot Reference",
+        columnLabel: "lotReference",
+        sortEnabled: true,
+        columnWidth: 175,
+      },
+      {
+        columnName: "Organization",
+        columnLabel: "organization",
+        sortEnabled: true,
+        columnWidth: 175,
+      },
+      {
+        columnName:"Metric",
+        columnLabel: "metric",
+        sortEnabled: true,
+        columnWidth: 175,
+      },
+      {
+        columnName: "Production Activity",
+        columnLabel: "productionActivity",
+        sortEnabled: true,
+        columnWidth: 175,
+      },
+
       {
         columnName: "Actions",
         columnLabel: "actions",
@@ -216,39 +235,39 @@ export default defineComponent({
       },
     ]);
     const selectedIds = ref<Array<number>>([]);
-    const tableData = ref<Array<IProductionActivity>>(productionActivities);
-    const productionActivity = ref<Object>([]);
-    const initProductionActivities = ref<Array<IProductionActivity>>([]);
+    const tableData = ref<Array<IValueRecord>>(valueRecords);
+    const valueRecord = ref<Object>([]);
+    const initValueRecords = ref<Array<IValueRecord>>([]);
     let current_page = ref<number>(0);
     let items_per_page = ref<number>(10);
 
     onMounted(() => {
-      initProductionActivities.value.splice(0, tableData.value.length, ...tableData.value);
+      initValueRecords.value.splice(0, tableData.value.length, ...tableData.value);
     });
 
-    const editProductionActivity = (ProductionActivityI: IProductionActivity) => {
-      productionActivity.value = ProductionActivityI;
-    };
-
-    const getProductActivities = async (current_page_param: number, items_per_page_param: number) => {
+    const getValueRecords = async (current_page_param: number, items_per_page_param: number) => {
       if(items_per_page.value !== items_per_page_param){
-        const response = await ApiService.get("production-activity?page=0&items_per_page=" + items_per_page_param);
+        const response = await ApiService.get("value-record?page=0&items_per_page=" + items_per_page_param);
         tableData.value = response.data.data;
       }else{
-        const response = await ApiService.get("production-activity?page=" + current_page_param + "&items_per_page=" + items_per_page_param);
+        const response = await ApiService.get("value-record?page=" + current_page_param + "&items_per_page=" + items_per_page_param);
         tableData.value = response.data.data;
       }
     };
 
     const currentPage = (page: any) => {
       page = page - 1;
-      getProductActivities(page, items_per_page.value);
+      getValueRecords(page, items_per_page.value);
       current_page.value = page;
     };
 
     const itemsPerPage = (items: any) => {
-      getProductActivities(current_page.value, items);
+      getValueRecords(current_page.value, items);
       items_per_page.value = items;
+    };
+
+    const editValueRecord = (valueRecordI: IValueRecord) => {
+      valueRecord.value = valueRecordI;
     };
 
     const deleteModalConfirmation = (id?: any) => {
@@ -268,13 +287,13 @@ export default defineComponent({
 
             if (selectedIds.value.length > 0){
               selectedIds.value.forEach((item) => {
-                ApiService.delete(`/production-activity/${item}`);
-                tableData.value = tableData.value.filter((productionActivity) => productionActivity.id !== item.toString());
+                ApiService.delete(`/value-record/${item}`);
+                tableData.value = tableData.value.filter((valueRecord) => valueRecord.id !== item.toString());
               });
               selectedIds.value.length = 0;
             }else{
-              ApiService.delete(`/production-activity/${id}`);
-              tableData.value = tableData.value.filter((productionActivity) => productionActivity.id !== id.toString());
+              ApiService.delete(`/value-record/${id}`);
+              tableData.value = tableData.value.filter((valueRecord) => valueRecord.id !== id.toString());
             }
             Swal.fire("Deleted!", "Your files have been deleted.", "success");
           } else if (result.dismiss === Swal.DismissReason.cancel) {
@@ -283,19 +302,19 @@ export default defineComponent({
         });
     }
 
-    const deleteFewProductionActivities = () => {
+    const deleteFewValueRecords = () => {
       deleteModalConfirmation();
     };
 
-    const deleteProductionActivity = (id: number) => {
+    const deleteValueRecord = (id: number) => {
       deleteModalConfirmation(id);
     };
 
     const search = ref<string>("");
     const searchItems = () => {
-      tableData.value.splice(0, tableData.value.length, ...initProductionActivities.value);
+      tableData.value.splice(0, tableData.value.length, ...initValueRecords.value);
       if (search.value !== "") {
-        let results: Array<IProductionActivity> = [];
+        let results: Array<IValueRecord> = [];
         for (let j = 0; j < tableData.value.length; j++) {
           if (searchingFunc(tableData.value[j], search.value)) {
             results.push(tableData.value[j]);
@@ -331,18 +350,18 @@ export default defineComponent({
     return {
       tableData,
       tableHeader,
-      deleteProductionActivity,
+      deleteValueRecord,
       search,
       searchItems,
       selectedIds,
-      deleteFewProductionActivities,
+      deleteFewValueRecords,
       sort,
       onItemSelect,
-      editProductionActivity,
-      productionActivity,
       currentPage,
       itemsPerPage,
       totalItems,
+      editValueRecord,
+      valueRecord,
     };
   },
 });

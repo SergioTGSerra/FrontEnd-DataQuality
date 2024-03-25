@@ -28,10 +28,10 @@
         class="menu-item menu-lg-down-accordion menu-sub-lg-down-indention me-0 me-lg-2"
       >
         <!--begin:Menu link-->
-        <span class="menu-link">
+        <!-- <span class="menu-link">
           <span class="menu-title">Help</span>
           <span class="menu-arrow d-lg-none"></span>
-        </span>
+        </span> -->
         <!--end:Menu link-->
         <!--begin:Menu sub-->
         <div
@@ -40,7 +40,7 @@
           <!--begin:Menu item-->
           <div class="menu-item">
             <!--begin:Menu link-->
-            <a
+            <!-- <a
               class="menu-link"
               href="https://preview.keenthemes.com/metronic8/vue/docs/base/utilities"
               title="Check out over 200 in-house components, plugins and ready for use solutions"
@@ -53,14 +53,14 @@
                 <KTIcon icon-name="rocket" icon-class="fs-3" />
               </span>
               <span class="menu-title">Components</span>
-            </a>
+            </a> -->
             <!--end:Menu link-->
           </div>
           <!--end:Menu item-->
           <!--begin:Menu item-->
           <div class="menu-item">
             <!--begin:Menu link-->
-            <a
+            <!-- <a
               class="menu-link"
               href="https://preview.keenthemes.com/metronic8/vue/docs/index"
               title="Check out the complete documentation"
@@ -73,14 +73,14 @@
                 <KTIcon icon-name="abstract-26" icon-class="fs-3" />
               </span>
               <span class="menu-title">Documentation</span>
-            </a>
+            </a> -->
             <!--end:Menu link-->
           </div>
           <!--end:Menu item-->
           <!--begin:Menu item-->
           <div class="menu-item">
             <!--begin:Menu link-->
-            <a
+            <!-- <a
               class="menu-link"
               href="https://preview.keenthemes.com/metronic8/vue/docs/getting-started/changelog"
             >
@@ -88,7 +88,7 @@
                 <KTIcon icon-name="code" icon-class="fs-3" />
               </span>
               <span class="menu-title">Changelog v{{ version }}</span>
-            </a>
+            </a> -->
             <!--end:Menu link-->
           </div>
           <!--end:Menu item-->
