@@ -9,32 +9,40 @@ const MainMenuConfig: Array<MenuItem> = [
         keenthemesIcon: "element-11",
         bootstrapIcon: "bi-app-indicator",
       },
+      /*
       {
         heading: "layoutBuilder",
         route: "/builder",
         keenthemesIcon: "switch",
         bootstrapIcon: "bi-layers",
-      },
+      },*/
       {
-        heading: "metrics",
+        heading: "Metrics",
         route: "/metrics",
         keenthemesIcon: "element-11",
         bootstrapIcon: "bi-app-indicator",
       },
       {
-        heading: "productionActivities",
+        heading: "Production Activities",
         route: "/productionActivities",
         keenthemesIcon: "element-11",
         bootstrapIcon: "bi-app-indicator",
       },
       {
-        heading: "organizations",
+        heading: "Organizations",
         route: "/organizations",
+        keenthemesIcon: "element-11",
+        bootstrapIcon: "bi-app-indicator",
+      },
+      {
+        heading: "Value Records",
+        route: "/valueRecords",
         keenthemesIcon: "element-11",
         bootstrapIcon: "bi-app-indicator",
       }
     ],
   },
+  /*
   {
     heading: "craft",
     route: "/crafted",
@@ -323,6 +331,7 @@ const MainMenuConfig: Array<MenuItem> = [
       },
     ],
   },
+  */
 ];
 
 export default MainMenuConfig;
