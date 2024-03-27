@@ -1,7 +1,8 @@
-import { ref } from "vue";
+import { onMounted, onUnmounted, ref } from "vue";
 import { defineStore } from "pinia";
 import ApiService from "@/core/services/ApiService";
 import JwtService from "@/core/services/JwtService";
+import AuthService from "@/core/services/AuthService";
 
 export interface User {
   name: string;
@@ -13,14 +14,15 @@ export interface User {
 
 export const useAuthStore = defineStore("auth", () => {
   const errors = ref({});
-  const user = ref<User>({} as User);
-  const isAuthenticated = ref(!!JwtService.getToken());
+  const user = ref<any>({} as any);
+  const isAuthenticated = ref(!!JwtService.getAccessToken());
 
-  function setAuth(authUser: User) {
+  function setAuth(authUser: any) {
     isAuthenticated.value = true;
     user.value = authUser;
     errors.value = {};
-    JwtService.saveToken(user.value.api_token);
+    JwtService.saveAccessToken(user.value.access_token);
+    JwtService.saveRefreshToken(user.value.refresh_token);
   }
 
   function setError(error: any) {
@@ -29,14 +31,15 @@ export const useAuthStore = defineStore("auth", () => {
 
   function purgeAuth() {
     isAuthenticated.value = false;
-    user.value = {} as User;
+    user.value = {} as any;
     errors.value = [];
-    JwtService.destroyToken();
+    JwtService.destroyAccessToken();
   }
 
-  function login(credentials: User) {
-    return ApiService.post("/user/login", credentials)
-      .then(({ data }) => {
+  function login(credentials: any) {
+    return AuthService.getToken(credentials)
+      .then((data) => {
+        console.log(data);
         setAuth(data);
       })
       .catch(({ response }) => {
@@ -48,7 +51,7 @@ export const useAuthStore = defineStore("auth", () => {
     purgeAuth();
   }
 
-  function register(credentials: User) {
+  function register(credentials: any) {
     return ApiService.post("register", credentials)
       .then(({ data }) => {
         setAuth(data);
@@ -69,9 +72,9 @@ export const useAuthStore = defineStore("auth", () => {
   }
 
   function verifyAuth() {
-    if (JwtService.getToken()) {
+    if (JwtService.getAccessToken()) {
       ApiService.setHeader();
-      ApiService.post("verify_token", { api_token: JwtService.getToken() })
+      ApiService.post("verify_token", { Access_token: JwtService.getAccessToken() })
         .then(({ data }) => {
           setAuth(data);
         })
@@ -83,6 +86,26 @@ export const useAuthStore = defineStore("auth", () => {
       purgeAuth();
     }
   }
+
+  function refreshToken() {
+    if(JwtService.getRefreshToken){
+      return AuthService.refreshToken()
+      .then((data) => {
+        console.log(data);
+        setAuth(data);
+      })
+      .catch(({ response }) => {
+        setError(response.data.errors);
+        purgeAuth();
+      });
+    }
+  }
+
+  function refreshTokenInterval() {
+    setInterval(refreshToken, 50000);
+  }
+  
+  refreshTokenInterval();
 
   return {
     errors,
