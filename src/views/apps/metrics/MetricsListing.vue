@@ -175,8 +175,13 @@ import arraySort from "array-sort";
 import { MenuComponent } from "@/assets/ts/components";
 import ApiService from "@/core/services/ApiService";
 import Swal from "sweetalert2";
+import { useAuthStore } from "@/stores/auth";
 
+const authStore = useAuthStore();
 const response = await ApiService.get("/metric");
+
+if(response.status === 401) authStore.refreshToken();
+
 const metrics = response.data.data;
 const totalItems = response.data.totalElements; 
 
@@ -216,7 +221,7 @@ export default defineComponent({
       },
     ]);
     const selectedIds = ref<Array<number>>([]);
-    const tableData = ref<Array<IMetric>>(metrics);
+    const tableData = ref<Array<IMetric>>(metrics? metrics : []);
     const metric = ref<Object>([]);
     const initMetrics = ref<Array<IMetric>>([]);
     let current_page = ref<number>(0);
