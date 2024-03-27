@@ -46,7 +46,7 @@
         <router-link to="/" class="mb-0 mb-lg-12">
           <img
             alt="Logo"
-            :src="getAssetPath('media/logos/custom-1.png')"
+            :src="getAssetPath('media/logos/logo-dark.png')"
             class="h-60px h-lg-75px"
           />
         </router-link>
@@ -69,7 +69,7 @@
         <!--end::Title-->
 
         <!--begin::Text-->
-        <div class="d-none d-lg-block text-white fs-base text-center">
+        <!-- <div class="d-none d-lg-block text-white fs-base text-center">
           In this kind of post,
           <a href="#" class="opacity-75-hover text-warning fw-bold me-1"
             >the blogger</a
@@ -83,7 +83,7 @@
           >
           and their <br />
           work following this is a transcript of the interview.
-        </div>
+        </div> -->
         <!--end::Text-->
       </div>
       <!--end::Content-->

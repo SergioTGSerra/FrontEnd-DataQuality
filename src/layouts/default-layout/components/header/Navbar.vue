@@ -73,7 +73,7 @@
     <!--begin::User menu-->
     <div class="app-navbar-item ms-1 ms-md-4" id="kt_header_user_menu_toggle">
       <!--begin::Menu wrapper-->
-      <!-- <div
+      <div
         class="cursor-pointer symbol symbol-35px"
         data-kt-menu-trigger="{default: 'click', lg: 'hover'}"
         data-kt-menu-attach="parent"
@@ -85,7 +85,7 @@
           alt="user"
         />
       </div>
-      <KTUserMenu /> -->
+      <KTUserMenu />
       <!--end::Menu wrapper-->
     </div>
     <!--end::User menu-->
