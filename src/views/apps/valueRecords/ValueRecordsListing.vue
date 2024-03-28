@@ -171,8 +171,13 @@ import { MenuComponent } from "@/assets/ts/components";
 import ApiService from "@/core/services/ApiService";
 import Swal from "sweetalert2";
 import type { IValueRecord } from "@/core/data/valueRecords";
+import { useAuthStore } from "@/stores/auth";
+
+const authStore = useAuthStore();
 
 const response = await ApiService.get("/value-record");
+if(response.status === 401) authStore.refreshToken();
+
 const valueRecords = response.data.data;
 const totalItems = response.data.totalElements; 
 
@@ -235,7 +240,7 @@ export default defineComponent({
       },
     ]);
     const selectedIds = ref<Array<number>>([]);
-    const tableData = ref<Array<IValueRecord>>(valueRecords);
+    const tableData = ref<Array<IValueRecord>>(valueRecords? valueRecords : []);
     const valueRecord = ref<Object>([]);
     const initValueRecords = ref<Array<IValueRecord>>([]);
     let current_page = ref<number>(0);

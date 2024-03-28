@@ -181,8 +181,13 @@ import arraySort from "array-sort";
 import { MenuComponent } from "@/assets/ts/components";
 import ApiService from "@/core/services/ApiService";
 import Swal from "sweetalert2";
+import { useAuthStore } from "@/stores/auth";
+
+const authStore = useAuthStore();
 
 const response = await ApiService.get("/production-activity");
+if(response.status === 401) authStore.refreshToken();
+
 const productionActivities = response.data.data;
 const totalItems = response.data.totalElements;
 
@@ -216,7 +221,7 @@ export default defineComponent({
       },
     ]);
     const selectedIds = ref<Array<number>>([]);
-    const tableData = ref<Array<IProductionActivity>>(productionActivities);
+    const tableData = ref<Array<IProductionActivity>>(productionActivities? productionActivities : []);
     const productionActivity = ref<Object>([]);
     const initProductionActivities = ref<Array<IProductionActivity>>([]);
     let current_page = ref<number>(0);

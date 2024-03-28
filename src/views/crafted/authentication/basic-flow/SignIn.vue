@@ -7,7 +7,7 @@
       id="kt_login_signin_form"
       @submit="onSubmitLogin"
       :validation-schema="login"
-      :initial-values="{ email: 'admin@demo.com', password: 'demo' }"
+      :initial-values="{ username: '', password: '' }"
     >
       <!--begin::Heading-->
       <div class="text-center mb-10">
@@ -27,17 +27,17 @@
       </div>
       <!--begin::Heading-->
 
-      <div class="mb-10 bg-light-info p-8 rounded">
+      <!-- <div class="mb-10 bg-light-info p-8 rounded">
         <div class="text-info">
           Use account <strong>admin@demo.com</strong> and password
           <strong>demo</strong> to continue.
         </div>
-      </div>
+      </div> -->
 
       <!--begin::Input group-->
       <div class="fv-row mb-10">
         <!--begin::Label-->
-        <label class="form-label fs-6 fw-bold text-gray-900">Email</label>
+        <label class="form-label fs-6 fw-bold text-gray-900">Username</label>
         <!--end::Label-->
 
         <!--begin::Input-->
@@ -45,13 +45,14 @@
           tabindex="1"
           class="form-control form-control-lg form-control-solid"
           type="text"
-          name="email"
+          name="username"
           autocomplete="off"
+          placeholder="Username"
         />
         <!--end::Input-->
         <div class="fv-plugins-message-container">
           <div class="fv-help-block">
-            <ErrorMessage name="email" />
+            <ErrorMessage name="username" />
           </div>
         </div>
       </div>
@@ -66,9 +67,9 @@
           <!--end::Label-->
 
           <!--begin::Link-->
-          <router-link to="/password-reset" class="link-primary fs-6 fw-bold">
+          <!-- <router-link to="/password-reset" class="link-primary fs-6 fw-bold">
             Forgot Password ?
-          </router-link>
+          </router-link> -->
           <!--end::Link-->
         </div>
         <!--end::Wrapper-->
@@ -80,6 +81,7 @@
           type="password"
           name="password"
           autocomplete="off"
+          placeholder="Password"
         />
         <!--end::Input-->
         <div class="fv-plugins-message-container">
@@ -112,11 +114,11 @@
         <!--end::Submit button-->
 
         <!--begin::Separator-->
-        <div class="text-center text-muted text-uppercase fw-bold mb-5">or</div>
+        <!-- <div class="text-center text-muted text-uppercase fw-bold mb-5">or</div> -->
         <!--end::Separator-->
 
         <!--begin::Google link-->
-        <a
+        <!-- <a
           href="#"
           class="btn btn-flex flex-center btn-light btn-lg w-100 mb-5"
         >
@@ -126,11 +128,11 @@
             class="h-20px me-3"
           />
           Continue with Google
-        </a>
+        </a> -->
         <!--end::Google link-->
 
         <!--begin::Google link-->
-        <a
+        <!-- <a
           href="#"
           class="btn btn-flex flex-center btn-light btn-lg w-100 mb-5"
         >
@@ -140,18 +142,18 @@
             class="h-20px me-3"
           />
           Continue with Facebook
-        </a>
+        </a> -->
         <!--end::Google link-->
 
         <!--begin::Google link-->
-        <a href="#" class="btn btn-flex flex-center btn-light btn-lg w-100">
+        <!-- <a href="#" class="btn btn-flex flex-center btn-light btn-lg w-100">
           <img
             alt="Logo"
             :src="getAssetPath('media/svg/brand-logos/apple-black.svg')"
             class="h-20px me-3"
           />
           Continue with Apple
-        </a>
+        </a> -->
         <!--end::Google link-->
       </div>
       <!--end::Actions-->
@@ -185,8 +187,8 @@ export default defineComponent({
 
     //Create form validation object
     const login = Yup.object().shape({
-      email: Yup.string().email().required().label("Email"),
-      password: Yup.string().min(4).required().label("Password"),
+      username: Yup.string().min(3).required().label("Username"),
+      password: Yup.string().min(3).required().label("Password"),
     });
 
     //Form submit function

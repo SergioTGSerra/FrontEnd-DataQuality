@@ -111,8 +111,8 @@
         <template v-slot:name="{ row: organization }">
           {{ organization.name }}
         </template>
-        <template v-slot:orgName="{ row: organization }">
-          {{ organization.orgName }}
+        <template v-slot:orgCode="{ row: organization }">
+          {{ organization.orgCode }}
         </template>
         <template v-slot:eac="{ row: organization }">
           {{ organization.eac }}
@@ -178,8 +178,13 @@ import arraySort from "array-sort";
 import { MenuComponent } from "@/assets/ts/components";
 import ApiService from "@/core/services/ApiService";
 import Swal from "sweetalert2";
+import { useAuthStore } from "@/stores/auth";
+
+const authStore = useAuthStore();
 
 const response = await ApiService.get("/organization");
+if(response.status === 401) authStore.refreshToken();
+
 const organizations = response.data.data;
 const totalItems = response.data.totalElements;
 
@@ -200,8 +205,8 @@ export default defineComponent({
         columnWidth: 175,
       },
       {
-        columnName: "Org Name",
-        columnLabel: "orgName",
+        columnName: "Org Code",
+        columnLabel: "orgCode",
         sortEnabled: true,
         columnWidth: 175,
       },
@@ -225,7 +230,7 @@ export default defineComponent({
       },
     ]);
     const selectedIds = ref<Array<number>>([]);
-    const tableData = ref<Array<IOrganization>>(organizations);
+    const tableData = ref<Array<IOrganization>>(organizations? organizations : []);
     const organization = ref<Object>([]);
     const initOrganizations = ref<Array<IOrganization>>([]);
     let current_page = ref<number>(0);

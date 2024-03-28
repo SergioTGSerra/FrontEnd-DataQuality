@@ -1,25 +1,38 @@
-const ID_TOKEN_KEY = "id_token" as string;
+const ACCESS_TOKEN = "access_token" as string;
+const REFRESH_TOKEN = "refresh_token" as string;
 
 /**
  * @description get token form localStorage
  */
-export const getToken = (): string | null => {
-  return window.localStorage.getItem(ID_TOKEN_KEY);
+export const getAccessToken = (): string | null => {
+  return window.localStorage.getItem(ACCESS_TOKEN);
+};
+
+export const getRefreshToken = (): string | null => {
+  return window.localStorage.getItem(REFRESH_TOKEN);
 };
 
 /**
  * @description save token into localStorage
  * @param token: string
  */
-export const saveToken = (token: string): void => {
-  window.localStorage.setItem(ID_TOKEN_KEY, token);
+export const saveAccessToken = (token: string): void => {
+  window.localStorage.setItem(ACCESS_TOKEN, token);
+};
+
+export const saveRefreshToken = (token: string): void => {
+  window.localStorage.setItem(REFRESH_TOKEN, token);
 };
 
 /**
  * @description remove token form localStorage
  */
-export const destroyToken = (): void => {
-  window.localStorage.removeItem(ID_TOKEN_KEY);
+export const destroyAccessToken = (): void => {
+  window.localStorage.removeItem(ACCESS_TOKEN);
 };
 
-export default { getToken, saveToken, destroyToken };
+export const destroyRefreshToken = (): void => {
+  window.localStorage.removeItem(REFRESH_TOKEN);
+};
+
+export default { getAccessToken, getRefreshToken, saveAccessToken, saveRefreshToken, destroyAccessToken, destroyRefreshToken};
