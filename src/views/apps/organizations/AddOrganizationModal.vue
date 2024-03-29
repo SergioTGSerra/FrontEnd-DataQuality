@@ -68,13 +68,13 @@
               <!--begin::Input group-->
               <div class="fv-row mb-7">
                 <!--begin::Label-->
-                <label class="required fs-6 fw-semibold mb-2">Org Name</label>
+                <label class="required fs-6 fw-semibold mb-2">Org Code</label>
                 <!--end::Label-->
 
                 <!--begin::Input-->
-                <el-form-item prop="orgName">
+                <el-form-item prop="orgCode">
                   <el-input
-                    v-model="formData.orgName"
+                    v-model="formData.orgCode"
                     type="text"
                     placeholder=""
                   />
@@ -118,6 +118,23 @@
                       {{ country.name }}
                     </el-option>
                   </el-select>
+                </el-form-item>
+                <!--end::Input-->
+              </div>
+              <!--end::Input group-->
+
+              <!--begin::Input group-->
+              <div class="fv-row mb-7">
+                <!--begin::Label-->
+                <label class="required fs-6 fw-semibold mb-2">Passsword</label>
+                <!--end::Label-->
+                <!--begin::Input-->
+                <el-form-item prop="password">
+                  <el-input
+                    v-model="formData.password"
+                    type="password"
+                    placeholder=""
+                  />
                 </el-form-item>
                 <!--end::Input-->
               </div>
@@ -187,9 +204,10 @@ export default defineComponent({
 
     const formData = ref({
       name: "",
-      orgName: "",
+      orgCode: "",
       eac: "",
       country: "",
+      password: "",
     });
 
     const rules = ref({
@@ -233,6 +251,18 @@ export default defineComponent({
         {
           required: true,
           message: "Country is required",
+          trigger: "change",
+        },
+      ],
+      password: [
+        {
+          required: true,
+          message: "Password is required",
+          trigger: "change",
+        },
+        {
+          min: 8,
+          message: "Password must be at least 8 characters",
           trigger: "change",
         },
       ],

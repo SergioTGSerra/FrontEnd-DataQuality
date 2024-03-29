@@ -68,23 +68,24 @@
               <!--begin::Input group-->
               <div class="fv-row mb-7">
                 <!--begin::Label-->
-                <label class="required fs-6 fw-semibold mb-2">Organization Name</label>
+                <label class="required fs-6 fw-semibold mb-2">Organization Code</label>
                 <!--end::Label-->
 
                 <!--begin::Input-->
-                <el-form-item prop="orgName">
+                <el-form-item prop="orgCode">
                   <el-input
-                    v-model="formData.orgName"
+                    v-model="formData.orgCode"
                     type="text"
                     placeholder=""
                   />
                 </el-form-item>
                 <!--end::Input-->
+              </div>
 
               <!--begin::Input group-->
               <div class="fv-row mb-7">
                 <!--begin::Label-->
-                <label class="required fs-6 fw-semibold mb-2">Organization Name</label>
+                <label class="required fs-6 fw-semibold mb-2">EAC</label>
                 <!--end::Label-->
 
                 <!--begin::Input-->
@@ -126,9 +127,25 @@
               </div>
               <!--end::Input group-->
 
+              <!--begin::Input group-->
+              <div class="fv-row mb-7">
+                <!--begin::Label-->
+                <label class="required fs-6 fw-semibold mb-2">Password</label>
+                <!--end::Label-->
+                <!--begin::Input-->
+                <el-form-item prop="password">
+                  <el-input
+                    v-model="formData.password"
+                    type="password"
+                    placeholder=""
+                  />
+                </el-form-item>
+                <!--end::Input-->
+              </div>
+              <!--end::Input group-->
+               
             </div>
             <!--end::Scroll-->
-          </div>
           </div>
           <!--end::Modal body-->
 
@@ -190,18 +207,20 @@ export default defineComponent({
 
     const formData = ref({
       name: "",
-      orgName: "",
+      orgCode: "",
       eac: "",
       country: "",
+      password: ""
     });
 
     watch(() => props.organization, (editOrganization) => {
       if (editOrganization) {
         formData.value = {
           name: editOrganization.name,
-          orgName: editOrganization.orgName,
+          orgCode: editOrganization.orgCode,
           eac: editOrganization.eac,
           country: editOrganization.country,
+          password: editOrganization.password
         };
         organizationID = editOrganization.id;
       }
@@ -220,7 +239,7 @@ export default defineComponent({
           trigger: "change",
         }
       ],
-      orgName: [
+      orgCode: [
         {
           required: true,
           message: "Organization name is required",
