@@ -50,6 +50,28 @@
               <!--begin::Input group-->
               <div class="fv-row mb-7">
                 <!--begin::Label-->
+                <label class="required fs-6 fw-semibold mb-2">Metric</label>
+                <!--end::Label-->
+
+                <!--begin::Input-->
+                <el-form-item prop="metricId">
+                  <el-select v-model="formData.metricId" placeholder="Select metric">
+                    <el-option
+                      v-for="metric in metrics"
+                      :key="metric.id"
+                      :label="metric.name"
+                      :value="metric.id"
+                    >
+                      {{ metric.name }}
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+                <!--end::Input-->
+              </div>
+              <!--end::Input group-->
+              <!--begin::Input group-->
+              <div class="fv-row mb-7">
+                <!--begin::Label-->
                 <label class="required fs-6 fw-semibold mb-2">Min</label>
                 <!--end::Label-->
 
@@ -178,29 +200,6 @@
               </div>
               <!--end::Input group-->
 
-              <!--begin::Input group-->
-              <div class="fv-row mb-7">
-                <!--begin::Label-->
-                <label class="required fs-6 fw-semibold mb-2">Metric</label>
-                <!--end::Label-->
-
-                <!--begin::Input-->
-                <el-form-item prop="metricId">
-                  <el-select v-model="formData.metricId" placeholder="Select metric">
-                    <el-option
-                      v-for="metric in metrics"
-                      :key="metric.id"
-                      :label="metric.name"
-                      :value="metric.id"
-                    >
-                      {{ metric.name }}
-                    </el-option>
-                  </el-select>
-                </el-form-item>
-                <!--end::Input-->
-              </div>
-              <!--end::Input group-->
-
             </div>
             <!--end::Scroll-->
           </div>
@@ -251,6 +250,7 @@ import Swal from "sweetalert2";
 import { hideModal } from "@/core/helpers/modal";
 import ApiService from "@/core/services/ApiService";
 import { validationFormulas } from "@/core/data/validationFormulas";
+import { success, fail, error } from "@/core/helpers/alertModal";
 
 const response = await ApiService.get("/metric");
 const metrics = response.data.data;
@@ -291,22 +291,16 @@ export default defineComponent({
           setTimeout(() => {
             loading.value = false;
 
-            Swal.fire({
-              text: "Form has been successfully submitted!",
-              icon: "success",
-              buttonsStyling: false,
-              confirmButtonText: "Ok, got it!",
-              heightAuto: false,
-              customClass: {
-                confirmButton: "btn btn-primary",
-              },
-            }).then(() => {
-              hideModal(associateProductionActivityModalRef.value);
-              (async () => {
-                const response = await ApiService.post("/production-activity-metric", formData.value);
+            (async () => {
+              const response = await ApiService.post("/production-activity-metric", formData.value);
+            
+              if (response.data.status === "fail")  fail(response.data.data);
+              else if(response.data.status === "error") error(response.data.message);
+              else{
+                success("The metric was associated with success!", associateProductionActivityModalRef.value);
                 props.tableData?.push(response.data.data);
-              })();
-            });
+              }
+            })();
           }, 2000);
         } else {
           Swal.fire({

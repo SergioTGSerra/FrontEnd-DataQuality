@@ -190,10 +190,10 @@
 
 <script lang="ts">
 import { defineComponent, ref, watch } from "vue";
-import { hideModal } from "@/core/helpers/modal";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import ApiService from "@/core/services/ApiService";
 import { countries } from "@/core/data/countries";
+import { success, fail, error } from "@/core/helpers/alertModal";
 
 export default defineComponent({
   name: "edit-organization-modal",
@@ -270,6 +270,18 @@ export default defineComponent({
           trigger: "change",
         },
       ],
+      password: [
+        {
+          min: 8,
+          message: "Password must be at least 8 characters",
+          trigger: "change",
+        },
+        {
+          max: 20,
+          message: "Password must be less than 20 characters",
+          trigger: "change",
+        }
+      ],
     });
 
     const updateOrganization = (organization) => {
@@ -292,20 +304,16 @@ export default defineComponent({
           setTimeout(() => {
             loading.value = false;
 
-            Swal.fire({
-              text: "Form has been successfully submitted!",
-              icon: "success",
-              buttonsStyling: false,
-              confirmButtonText: "Ok, got it!",
-              heightAuto: false,
-              customClass: {
-                confirmButton: "btn btn-primary",
-              },
-            }).then(async () => {
-              hideModal(editOrganizationModalRef.value);
-              const res = await ApiService.put("/organization/" + organizationID, formData.value);
-              updateOrganization(res.data.data);
-            });
+            (async () => {
+              const response = await ApiService.put("/organization/" + organizationID, formData.value);
+
+              if (response.data.status === "fail")  fail(response.data.data);
+              else if(response.data.status === "error") error(response.data.message);
+              else{
+                success("Organization updated with success!", editOrganizationModalRef.value);
+                updateOrganization(response.data.data);
+              }
+            })();
           }, 2000);
         } else {
           Swal.fire({

@@ -186,10 +186,10 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import { hideModal } from "@/core/helpers/modal";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import ApiService from "@/core/services/ApiService";
 import { countries } from "@/core/data/countries";
+import { success, fail, error } from "@/core/helpers/alertModal";
 
 export default defineComponent({
   name: "add-organization-modal",
@@ -280,22 +280,16 @@ export default defineComponent({
           setTimeout(() => {
             loading.value = false;
 
-            Swal.fire({
-              text: "Form has been successfully submitted!",
-              icon: "success",
-              buttonsStyling: false,
-              confirmButtonText: "Ok, got it!",
-              heightAuto: false,
-              customClass: {
-                confirmButton: "btn btn-primary",
-              },
-            }).then(() => {
-              hideModal(addOrganizationModalRef.value);
-              (async () => {
-                const response = await ApiService.post("/organization", formData.value);
+            (async () => {
+              const response = await ApiService.post("/organization", formData.value);
+            
+              if (response.data.status === "fail")  fail(response.data.data);
+              else if(response.data.status === "error") error(response.data.message);
+              else{
+                success("Organization created with success!", addOrganizationModalRef.value);
                 props.tableData?.push(response.data.data);
-              })();
-            });
+              }
+            })();
           }, 2000);
         } else {
           Swal.fire({

@@ -207,6 +207,7 @@ import { defineComponent, ref } from "vue";
 import { hideModal } from "@/core/helpers/modal";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import ApiService from "@/core/services/ApiService";
+import { success, fail, error } from "@/core/helpers/alertModal";
 
 const responseMetrics = await ApiService.get("/metric");
 const metrics = responseMetrics.data.data;
@@ -255,22 +256,16 @@ export default defineComponent({
           setTimeout(() => {
             loading.value = false;
 
-            Swal.fire({
-              text: "Form has been successfully submitted!",
-              icon: "success",
-              buttonsStyling: false,
-              confirmButtonText: "Ok, got it!",
-              heightAuto: false,
-              customClass: {
-                confirmButton: "btn btn-primary",
-              },
-            }).then(() => {
-              hideModal(addValueRecordModalRef.value);
-              (async () => {
-                const response = await ApiService.post("/value-record", formData.value);
+            (async () => {
+              const response = await ApiService.post("/value-record", formData.value);
+            
+              if (response.data.status === "fail")  fail(response.data.data);
+              else if(response.data.status === "error") error(response.data.message);
+              else{
+                success("Value record created with success!", addValueRecordModalRef.value);
                 props.tableData?.push(response.data.data);
-              })();
-            });
+              }
+            })();
           }, 2000);
         } else {
           Swal.fire({
