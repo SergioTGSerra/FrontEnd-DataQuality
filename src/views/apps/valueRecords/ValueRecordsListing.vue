@@ -147,8 +147,10 @@
             <!--begin::Menu item-->
             <div class="menu-item px-3">
               <a @click="deleteValueRecord(valueRecord.id)" class="menu-link px-3"
-                >Delete</a
-              >
+                >
+                <KTIcon icon-name="trash" icon-class="fs-5 me-3" />
+                Delete
+                </a>
             </div>
             <!--end::Menu item-->
           </div>
@@ -172,6 +174,7 @@ import ApiService from "@/core/services/ApiService";
 import Swal from "sweetalert2";
 import type { IValueRecord } from "@/core/data/valueRecords";
 import { useAuthStore } from "@/stores/auth";
+import KTIcon from "@/core/helpers/kt-icon/KTIcon.vue";
 
 const authStore = useAuthStore();
 

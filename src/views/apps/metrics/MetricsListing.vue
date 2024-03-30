@@ -139,16 +139,19 @@
                 data-bs-toggle="modal"
                 data-bs-target="#kt_modal_edit_metric"
                 class="menu-link px-3"
-                >Edit</a
               >
-                            
+                <KTIcon icon-name="pencil" icon-class="fs-5 me-3" />
+                Edit
+              </a>
             </div>
             <!--end::Menu item-->
             <!--begin::Menu item-->
             <div class="menu-item px-3">
               <a @click="deleteMetric(metric.id)" class="menu-link px-3"
-                >Delete</a
-              >
+                >
+                <KTIcon icon-name="trash" icon-class="fs-5 me-3" />
+                Delete
+            </a>
             </div>
             <!--end::Menu item-->
           </div>

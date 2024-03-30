@@ -135,6 +135,7 @@
                   :to="`/productionActivities/${productionActivity.id}`"
                   class="menu-link px-3"
                 >
+                  <KTIcon icon-name="eye" icon-class="fs-5 me-3" />
                   View
               </router-link>
             </div>
@@ -145,16 +146,19 @@
                 data-bs-toggle="modal"
                 data-bs-target="#kt_modal_edit_productionActivity"
                 class="menu-link px-3"
-                >Edit</a
-              >
-                            
+                >
+                <KTIcon icon-name="pencil" icon-class="fs-5 me-3" />
+                Edit
+              </a>           
             </div>
             <!--end::Menu item-->
             <!--begin::Menu item-->
             <div class="menu-item px-3">
               <a @click="deleteProductionActivity(productionActivity.id)" class="menu-link px-3"
-                >Delete</a
-              >
+                >
+                <KTIcon icon-name="trash" icon-class="fs-5 me-3" />
+                Delete
+              </a>
             </div>
             <!--end::Menu item-->
           </div>
