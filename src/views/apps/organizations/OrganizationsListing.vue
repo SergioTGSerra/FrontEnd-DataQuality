@@ -121,44 +121,36 @@
           {{ organization.country }}
         </template>
         <template v-slot:actions="{ row: organization }">
+          <!--begin::Edit-->
           <a
+            @click="editOrganization(organization)"
             href="#"
-            class="btn btn-sm btn-light btn-active-light-primary"
-            data-kt-menu-trigger="click"
-            data-kt-menu-placement="bottom-end"
-            data-kt-menu-flip="top-end"
-            >Actions
-            <KTIcon icon-name="down" icon-class="fs-5 m-0" />
-          </a>
-          <!--begin::Menu-->
-          <div
-            class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-125px py-4"
-            data-kt-menu="true"
+            class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
+            data-bs-toggle="modal"
+            data-bs-target="#kt_modal_edit_organization"
+            title="Edit"
           >
-            <!--begin::Menu item-->
-            <div class="menu-item px-3">
-              <a
-                @click="editOrganization(organization)"
-                data-bs-toggle="modal"
-                data-bs-target="#kt_modal_edit_organization"
-                class="menu-link px-3"
-                >
-                <KTIcon icon-name="pencil" icon-class="fs-5 me-3" />
-                Edit
-              </a>              
-            </div>
-            <!--end::Menu item-->
-            <!--begin::Menu item-->
-            <div class="menu-item px-3">
-              <a @click="deleteOrganization(organization.id)" class="menu-link px-3"
-                >
-                <KTIcon icon-name="trash" icon-class="fs-5 me-3" />
-                Delete
-              </a>
-            </div>
-            <!--end::Menu item-->
-          </div>
-          <!--end::Menu-->
+            <span
+              data-bs-toggle="tooltip"
+              data-bs-trigger="hover"
+              data-bs-original-title="Edit"
+            >
+              <KTIcon icon-name="pencil" icon-class="fs-3" />
+            </span>
+          </a>
+          <!--end::Edit-->
+          <!--begin::Delete-->
+          <a
+            @click="deleteOrganization(organization.id)"
+            href="#"
+            class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
+            data-bs-toggle="tooltip"
+            data-bs-original-title="Delete"
+            title="Delete"
+          >
+            <KTIcon icon-name="trash" icon-class="fs-3" />
+          </a>
+          <!--end::Delete-->
         </template>
       </Datatable>
     </div>

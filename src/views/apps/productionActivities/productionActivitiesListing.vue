@@ -115,54 +115,49 @@
           {{ productionActivity.reference }}
         </template>
         <template v-slot:actions="{ row: productionActivity }">
-          <a
-            href="#"
-            class="btn btn-sm btn-light btn-active-light-primary"
-            data-kt-menu-trigger="click"
-            data-kt-menu-placement="bottom-end"
-            data-kt-menu-flip="top-end"
-            >Actions
-            <KTIcon icon-name="down" icon-class="fs-5 m-0" />
-          </a>
-          <!--begin::Menu-->
-          <div
-            class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-125px py-4"
-            data-kt-menu="true"
+          <!--begin::View-->
+          <a 
+            href=""
+            class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
+            title="View"
           >
-
-            <div class="menu-item px-3">
-              <router-link
-                  :to="`/productionActivities/${productionActivity.id}`"
-                  class="menu-link px-3"
-                >
-                  <KTIcon icon-name="eye" icon-class="fs-5 me-3" />
-                  View
-              </router-link>
-            </div>
-            <!--begin::Menu item-->
-            <div class="menu-item px-3">
-              <a
-                @click="editProductionActivity(productionActivity)"
-                data-bs-toggle="modal"
-                data-bs-target="#kt_modal_edit_productionActivity"
-                class="menu-link px-3"
-                >
-                <KTIcon icon-name="pencil" icon-class="fs-5 me-3" />
-                Edit
-              </a>           
-            </div>
-            <!--end::Menu item-->
-            <!--begin::Menu item-->
-            <div class="menu-item px-3">
-              <a @click="deleteProductionActivity(productionActivity.id)" class="menu-link px-3"
-                >
-                <KTIcon icon-name="trash" icon-class="fs-5 me-3" />
-                Delete
-              </a>
-            </div>
-            <!--end::Menu item-->
-          </div>
-          <!--end::Menu-->
+            <router-link
+              :to="`/productionActivities/${productionActivity.id}`"
+            >
+              <KTIcon icon-name="eye" icon-class="fs-3" />
+            </router-link>
+          </a> 
+          <!--end::View-->
+          <!--begin::Edit-->
+          <a
+            @click="editProductionActivity(productionActivity)"
+            href="#"
+            class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
+            data-bs-toggle="modal"
+            data-bs-target="#kt_modal_edit_productionActivity"
+            title="Edit"
+          >
+            <span
+              data-bs-toggle="tooltip"
+              data-bs-trigger="hover"
+              data-bs-original-title="Edit"
+            >
+              <KTIcon icon-name="pencil" icon-class="fs-3" />
+            </span>
+          </a>
+          <!--end::Edit-->
+          <!--begin::Delete-->
+          <a
+            @click="deleteProductionActivity(productionActivity.id)"
+            href="#"
+            class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
+            data-bs-toggle="tooltip"
+            data-bs-original-title="Delete"
+            title="Delete"
+          >
+            <KTIcon icon-name="trash" icon-class="fs-3" />
+          </a>
+          <!--end::Delete-->   
         </template>
       </Datatable>
     </div>
@@ -221,7 +216,7 @@ export default defineComponent({
         columnName: "Actions",
         columnLabel: "actions",
         sortEnabled: false,
-        columnWidth: 135,
+        columnWidth: 100,
       },
     ]);
     const selectedIds = ref<Array<number>>([]);

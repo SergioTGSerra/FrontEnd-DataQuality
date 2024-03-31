@@ -130,31 +130,18 @@
           {{ valueRecord.organization.name }}
         </template>
         <template v-slot:actions="{ row: valueRecord }">
+          <!--begin::Delete-->
           <a
+            @click="deleteValueRecord(valueRecord.id)"
             href="#"
-            class="btn btn-sm btn-light btn-active-light-primary"
-            data-kt-menu-trigger="click"
-            data-kt-menu-placement="bottom-end"
-            data-kt-menu-flip="top-end"
-            >Actions
-            <KTIcon icon-name="down" icon-class="fs-5 m-0" />
-          </a>
-          <!--begin::Menu-->
-          <div
-            class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-125px py-4"
-            data-kt-menu="true"
+            class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
+            data-bs-toggle="tooltip"
+            data-bs-original-title="Delete"
+            title="Delete"
           >
-            <!--begin::Menu item-->
-            <div class="menu-item px-3">
-              <a @click="deleteValueRecord(valueRecord.id)" class="menu-link px-3"
-                >
-                <KTIcon icon-name="trash" icon-class="fs-5 me-3" />
-                Delete
-                </a>
-            </div>
-            <!--end::Menu item-->
-          </div>
-          <!--end::Menu-->
+            <KTIcon icon-name="trash" icon-class="fs-3" />
+          </a>
+          <!--end::Delete-->
         </template>
       </Datatable>
     </div>
