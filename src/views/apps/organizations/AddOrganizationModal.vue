@@ -68,13 +68,13 @@
               <!--begin::Input group-->
               <div class="fv-row mb-7">
                 <!--begin::Label-->
-                <label class="required fs-6 fw-semibold mb-2">Org Name</label>
+                <label class="required fs-6 fw-semibold mb-2">Org Code</label>
                 <!--end::Label-->
 
                 <!--begin::Input-->
-                <el-form-item prop="orgName">
+                <el-form-item prop="orgCode">
                   <el-input
-                    v-model="formData.orgName"
+                    v-model="formData.orgCode"
                     type="text"
                     placeholder=""
                   />
@@ -118,6 +118,23 @@
                       {{ country.name }}
                     </el-option>
                   </el-select>
+                </el-form-item>
+                <!--end::Input-->
+              </div>
+              <!--end::Input group-->
+
+              <!--begin::Input group-->
+              <div class="fv-row mb-7">
+                <!--begin::Label-->
+                <label class="required fs-6 fw-semibold mb-2">Passsword</label>
+                <!--end::Label-->
+                <!--begin::Input-->
+                <el-form-item prop="password">
+                  <el-input
+                    v-model="formData.password"
+                    type="password"
+                    placeholder=""
+                  />
                 </el-form-item>
                 <!--end::Input-->
               </div>
@@ -169,10 +186,10 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import { hideModal } from "@/core/helpers/modal";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import ApiService from "@/core/services/ApiService";
 import { countries } from "@/core/data/countries";
+import { success, fail, error } from "@/core/helpers/alertModal";
 
 export default defineComponent({
   name: "add-organization-modal",
@@ -187,9 +204,10 @@ export default defineComponent({
 
     const formData = ref({
       name: "",
-      orgName: "",
+      orgCode: "",
       eac: "",
       country: "",
+      password: "",
     });
 
     const rules = ref({
@@ -236,6 +254,18 @@ export default defineComponent({
           trigger: "change",
         },
       ],
+      password: [
+        {
+          required: true,
+          message: "Password is required",
+          trigger: "change",
+        },
+        {
+          min: 8,
+          message: "Password must be at least 8 characters",
+          trigger: "change",
+        },
+      ],
     });
 
     const submit = () => {
@@ -250,22 +280,16 @@ export default defineComponent({
           setTimeout(() => {
             loading.value = false;
 
-            Swal.fire({
-              text: "Form has been successfully submitted!",
-              icon: "success",
-              buttonsStyling: false,
-              confirmButtonText: "Ok, got it!",
-              heightAuto: false,
-              customClass: {
-                confirmButton: "btn btn-primary",
-              },
-            }).then(() => {
-              hideModal(addOrganizationModalRef.value);
-              (async () => {
-                const response = await ApiService.post("/organization", formData.value);
+            (async () => {
+              const response = await ApiService.post("/organization", formData.value);
+            
+              if (response.data.status === "fail")  fail(response.data.data);
+              else if(response.data.status === "error") error(response.data.message);
+              else{
+                success("Organization created with success!", addOrganizationModalRef.value);
                 props.tableData?.push(response.data.data);
-              })();
-            });
+              }
+            })();
           }, 2000);
         } else {
           Swal.fire({

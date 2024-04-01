@@ -68,7 +68,7 @@
               <!--begin::Input group-->
               <div class="fv-row mb-7">
                 <!--begin::Label-->
-                <label class="required fs-6 fw-semibold mb-2">Description</label>
+                <label class="required fs-6 fw-semibold mb-2">Reference</label>
                 <!--end::Label-->
 
                 <!--begin::Input-->
@@ -131,6 +131,7 @@ import { defineComponent, ref } from "vue";
 import { hideModal } from "@/core/helpers/modal";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import ApiService from "@/core/services/ApiService";
+import { success, fail, error } from "@/core/helpers/alertModal";
 
 export default defineComponent({
   name: "add-productionActivity-modal",
@@ -186,22 +187,16 @@ export default defineComponent({
           setTimeout(() => {
             loading.value = false;
 
-            Swal.fire({
-              text: "Form has been successfully submitted!",
-              icon: "success",
-              buttonsStyling: false,
-              confirmButtonText: "Ok, got it!",
-              heightAuto: false,
-              customClass: {
-                confirmButton: "btn btn-primary",
-              },
-            }).then(() => {
-              hideModal(addProductionActivityModalRef.value);
-              (async () => {
-                const response = await ApiService.post("/production-activity", formData.value);
+            (async () => {
+              const response = await ApiService.post("/production-activity", formData.value);
+            
+              if (response.data.status === "fail")  fail(response.data.data);
+              else if(response.data.status === "error") error(response.data.message);
+              else{
+                success("Production activity created with success!", addProductionActivityModalRef.value);
                 props.tableData?.push(response.data.data);
-              })();
-            });
+              }
+            })();
           }, 2000);
         } else {
           Swal.fire({

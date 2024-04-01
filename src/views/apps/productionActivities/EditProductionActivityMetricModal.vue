@@ -228,6 +228,7 @@ import { hideModal } from "@/core/helpers/modal";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import ApiService from "@/core/services/ApiService";
 import { validationFormulas } from "@/core/data/validationFormulas";
+import { success, fail, error } from "@/core/helpers/alertModal";
 
 export default defineComponent({
   name: "edit-productionActivityMetric-modal",
@@ -300,20 +301,16 @@ export default defineComponent({
           setTimeout(() => {
             loading.value = false;
 
-            Swal.fire({
-              text: "Form has been successfully submitted!",
-              icon: "success",
-              buttonsStyling: false,
-              confirmButtonText: "Ok, got it!",
-              heightAuto: false,
-              customClass: {
-                confirmButton: "btn btn-primary",
-              },
-            }).then(async () => {
-              hideModal(editProductionActivityMetricModalRef.value);
-              const res = await ApiService.put("/production-activity-metric/" + metricId + "/" + productionActivityId, formData.value);
-              updateproductionActivityMetric(res.data.data);
-            });
+            (async () => {
+              const response = await ApiService.put("/production-activity-metric/" + metricId + "/" + productionActivityId, formData.value);
+            
+              if (response.data.status === "fail")  fail(response.data.data);
+              else if(response.data.status === "error") error(response.data.message);
+              else{
+                success("Production activity metric updated with success!", editProductionActivityMetricModalRef.value);
+                updateproductionActivityMetric(response.data.data);
+              }
+            })();
           }, 2000);
         } else {
           Swal.fire({

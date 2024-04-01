@@ -6,7 +6,7 @@ const MainMenuConfig: Array<MenuItem> = [
       {
         heading: "dashboard",
         route: "/dashboard",
-        keenthemesIcon: "element-11",
+        keenthemesIcon: "chart-pie-3",
         bootstrapIcon: "bi-app-indicator",
       },
       /*
@@ -19,7 +19,7 @@ const MainMenuConfig: Array<MenuItem> = [
       {
         heading: "Metrics",
         route: "/metrics",
-        keenthemesIcon: "element-11",
+        keenthemesIcon: "cube-2",
         bootstrapIcon: "bi-app-indicator",
       },
       {
@@ -31,13 +31,13 @@ const MainMenuConfig: Array<MenuItem> = [
       {
         heading: "Organizations",
         route: "/organizations",
-        keenthemesIcon: "element-11",
+        keenthemesIcon: "people",
         bootstrapIcon: "bi-app-indicator",
       },
       {
         heading: "Value Records",
         route: "/valueRecords",
-        keenthemesIcon: "element-11",
+        keenthemesIcon: "chart-line",
         bootstrapIcon: "bi-app-indicator",
       }
     ],

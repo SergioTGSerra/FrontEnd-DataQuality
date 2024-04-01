@@ -148,9 +148,9 @@
 
 <script lang="ts">
 import { defineComponent, ref, watch } from "vue";
-import { hideModal } from "@/core/helpers/modal";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import ApiService from "@/core/services/ApiService";
+import { success, fail, error } from "@/core/helpers/alertModal";
 
 export default defineComponent({
   name: "edit-metric-modal",
@@ -233,20 +233,16 @@ export default defineComponent({
           setTimeout(() => {
             loading.value = false;
 
-            Swal.fire({
-              text: "Form has been successfully submitted!",
-              icon: "success",
-              buttonsStyling: false,
-              confirmButtonText: "Ok, got it!",
-              heightAuto: false,
-              customClass: {
-                confirmButton: "btn btn-primary",
-              },
-            }).then(async () => {
-              hideModal(editMetricModalRef.value);
-              const res = await ApiService.put("/metric/" + metricID, formData.value);
-              updateMetric(res.data.data);
-            });
+            (async () => {
+              const response = await ApiService.put("/metric/" + metricID, formData.value);
+            
+              if (response.data.status === "fail")  fail(response.data.data);
+              else if(response.data.status === "error") error(response.data.message);
+              else{
+                success("Organization updated with success!", editMetricModalRef.value);
+                updateMetric(response.data.data);
+              }
+            })();
           }, 2000);
         } else {
           Swal.fire({
