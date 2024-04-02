@@ -54,6 +54,7 @@
               <a
                 href="#"
                 @click="editProductionActivity(productionActivity)"
+                @change="editProductionActivity(productionActivity)"
                 class="btn btn-sm btn-light-primary"
                 data-bs-toggle="modal"
                 data-bs-target="#kt_modal_edit_productionActivity"
@@ -272,13 +273,13 @@
   <!--end::Layout-->
 
   <AssociateProductionActivityToMetricModal :tableData="tableData" :productionActivityId="dynamicRouteId"></AssociateProductionActivityToMetricModal>
-  <EditProductionActivityModal :productionActivity="productionActivity" :tableData="tableData"></EditProductionActivityModal>
+  <EditProductionActivityModal :productionActivity="productionActivity" :tableData="tableData" @productionActivityUpdated="editProductionActivity"></EditProductionActivityModal>
   <EditProductionActivityModalMetric :productionActivitiesMetrics="productionActivitiesMetrics" :productionActivityId="dynamicRouteId" :tableData="tableData"></EditProductionActivityModalMetric>
 </template>
 
 <script lang="ts">
 import { getAssetPath } from "@/core/helpers/assets";
-import { defineComponent, onMounted, ref } from "vue";
+import { defineComponent, onMounted, ref, watch } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
 import AssociateProductionActivityToMetricModal from "./AssociateProductionActivityToMetricModal.vue";
