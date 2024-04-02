@@ -74,7 +74,12 @@ class ApiService {
    * @returns Promise<AxiosResponse>
    */
   public static post(resource: string, params: any): Promise<AxiosResponse> {
-    return ApiService.vueInstance.axios.post(`${resource}`, params);
+    const res = ApiService.vueInstance.axios.post(`${resource}`, params);
+    return res.then((response) => {
+      return response;
+    }).catch((error) => {
+      return error.response;
+    });
   }
 
   /**
@@ -89,7 +94,12 @@ class ApiService {
     slug: string,
     params: any
   ): Promise<AxiosResponse> {
-    return ApiService.vueInstance.axios.put(`${resource}/${slug}`, params);
+    const res = ApiService.vueInstance.axios.put(`${resource}/${slug}`, params);
+    return res.then((response) => {
+      return response;
+    }).catch((error) => {
+      return error.response;
+    });
   }
 
   /**
@@ -99,7 +109,12 @@ class ApiService {
    * @returns Promise<AxiosResponse>
    */
   public static put(resource: string, params: any): Promise<AxiosResponse> {
-    return ApiService.vueInstance.axios.put(`${resource}`, params);
+    const res = ApiService.vueInstance.axios.put(`${resource}`, params);
+    return res.then((response) => {
+      return response;
+    }).catch((error) => {
+      return error.response;
+    });
   }
 
   /**
@@ -108,7 +123,12 @@ class ApiService {
    * @returns Promise<AxiosResponse>
    */
   public static delete(resource: string): Promise<AxiosResponse> {
-    return ApiService.vueInstance.axios.delete(resource);
+    const res = ApiService.vueInstance.axios.delete(resource);
+    return res.then((response) => {
+      return response;
+    }).catch((error) => {
+      return error.response;
+    });
   }
 }
 
