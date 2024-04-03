@@ -4,7 +4,7 @@
       <!--begin::Card title-->
       <div class="card-title">
         <!--begin::Search-->
-        <div class="d-flex align-items-center position-relative my-1">
+        <!-- <div class="d-flex align-items-center position-relative my-1">
           <KTIcon
             icon-name="magnifier"
             icon-class="fs-1 position-absolute ms-6"
@@ -16,7 +16,7 @@
             class="form-control form-control-solid w-250px ps-15"
             placeholder="Search Organizations"
           />
-        </div>
+        </div> -->
         <!--end::Search-->
       </div>
       <!--begin::Card title-->
@@ -29,7 +29,7 @@
           data-kt-organization-table-toolbar="base"
         >
           <!--begin::Export-->
-          <button
+          <!-- <button
             type="button"
             class="btn btn-light-primary me-3"
             data-bs-toggle="modal"
@@ -37,7 +37,7 @@
           >
             <KTIcon icon-name="exit-up" icon-class="fs-2" />
             Export
-          </button>
+          </button> -->
           <!--end::Export-->
           <!--begin::Add organization-->
           <button
@@ -156,7 +156,7 @@
     </div>
   </div>
 
-  <ExportOrganizationModal></ExportOrganizationModal>
+  <!-- <ExportOrganizationModal></ExportOrganizationModal> -->
   <AddOrganizationModal :tableData="tableData"></AddOrganizationModal>
   <EditOrganizationModal :organization="organization" :tableData="tableData"></EditOrganizationModal>
 </template>
@@ -165,7 +165,7 @@
 import { defineComponent, onMounted, ref } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
-import ExportOrganizationModal from "@/components/modals/forms/ExportMetricModal.vue";
+// import ExportOrganizationModal from "@/components/modals/forms/ExportMetricModal.vue";
 import AddOrganizationModal from "@/views/apps/organizations/AddOrganizationModal.vue";
 import EditOrganizationModal from "./EditOrganizationModal.vue";
 import type { IOrganization } from "@/core/data/organizations";
@@ -187,7 +187,6 @@ export default defineComponent({
   name: "organizations-listing",
   components: {
     Datatable,
-    ExportOrganizationModal,
     AddOrganizationModal,
     EditOrganizationModal,
   },
@@ -300,31 +299,31 @@ export default defineComponent({
       deleteModalConfirmation(id);
     };
 
-    const search = ref<string>("");
-    const searchItems = () => {
-      tableData.value.splice(0, tableData.value.length, ...initOrganizations.value);
-      if (search.value !== "") {
-        let results: Array<IOrganization> = [];
-        for (let j = 0; j < tableData.value.length; j++) {
-          if (searchingFunc(tableData.value[j], search.value)) {
-            results.push(tableData.value[j]);
-          }
-        }
-        tableData.value.splice(0, tableData.value.length, ...results);
-      }
-      MenuComponent.reinitialization();
-    };
+    // const search = ref<string>("");
+    // const searchItems = () => {
+    //   tableData.value.splice(0, tableData.value.length, ...initOrganizations.value);
+    //   if (search.value !== "") {
+    //     let results: Array<IOrganization> = [];
+    //     for (let j = 0; j < tableData.value.length; j++) {
+    //       if (searchingFunc(tableData.value[j], search.value)) {
+    //         results.push(tableData.value[j]);
+    //       }
+    //     }
+    //     tableData.value.splice(0, tableData.value.length, ...results);
+    //   }
+    //   MenuComponent.reinitialization();
+    // };
 
-    const searchingFunc = (obj: any, value: string): boolean => {
-      for (let key in obj) {
-        if (!Number.isInteger(obj[key]) && !(typeof obj[key] === "object")) {
-          if (obj[key].indexOf(value) != -1) {
-            return true;
-          }
-        }
-      }
-      return false;
-    };
+    // const searchingFunc = (obj: any, value: string): boolean => {
+    //   for (let key in obj) {
+    //     if (!Number.isInteger(obj[key]) && !(typeof obj[key] === "object")) {
+    //       if (obj[key].indexOf(value) != -1) {
+    //         return true;
+    //       }
+    //     }
+    //   }
+    //   return false;
+    // };
 
     const sort = (sort: Sort) => {
       const reverse: boolean = sort.order === "asc";
@@ -341,8 +340,6 @@ export default defineComponent({
       tableData,
       tableHeader,
       deleteOrganization,
-      search,
-      searchItems,
       selectedIds,
       deleteFewOrganizations,
       sort,
