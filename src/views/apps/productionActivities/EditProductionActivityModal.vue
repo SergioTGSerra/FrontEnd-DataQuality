@@ -128,7 +128,6 @@
 
 <script lang="ts">
 import { defineComponent, ref, watch } from "vue";
-import { hideModal } from "@/core/helpers/modal";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import ApiService from "@/core/services/ApiService";
 import { success, fail, error } from "@/core/helpers/alertModal";
@@ -137,7 +136,7 @@ export default defineComponent({
   name: "edit-productionActivity-modal",
   props: ['productionActivity', 'tableData'],
   components: {},
-  setup(props) {
+  setup(props, { emit }) {
     const formRef = ref<null | HTMLFormElement>(null);
     const editProductionActivityModalRef = ref<null | HTMLElement>(null);
     const loading = ref<boolean>(false);
@@ -213,6 +212,8 @@ export default defineComponent({
               else{
                 success("Production activity updated with success!", editProductionActivityModalRef.value);
                 updateProductionActivity(response.data.data);
+                props.productionActivity.value = response.data.data;
+                emit('productionActivityUpdated', props.productionActivity.value);
               }
             })();
           }, 2000);
