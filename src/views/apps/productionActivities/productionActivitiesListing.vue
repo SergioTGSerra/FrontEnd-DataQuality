@@ -4,7 +4,7 @@
       <!--begin::Card title-->
       <div class="card-title">
         <!--begin::Search-->
-        <div class="d-flex align-items-center position-relative my-1">
+        <!-- <div class="d-flex align-items-center position-relative my-1">
           <KTIcon
             icon-name="magnifier"
             icon-class="fs-1 position-absolute ms-6"
@@ -16,7 +16,7 @@
             class="form-control form-control-solid w-250px ps-15"
             placeholder="Search Production Activity"
           />
-        </div>
+        </div> -->
         <!--end::Search-->
       </div>
       <!--begin::Card title-->
@@ -29,7 +29,7 @@
           data-kt-productionActivity-table-toolbar="base"
         >
           <!--begin::Export-->
-          <button
+          <!-- <button
             type="button"
             class="btn btn-light-primary me-3"
             data-bs-toggle="modal"
@@ -37,7 +37,7 @@
           >
             <KTIcon icon-name="exit-up" icon-class="fs-2" />
             Export
-          </button>
+          </button> -->
           <!--end::Export-->
           <!--begin::Add productionActivity-->
           <button
@@ -163,7 +163,7 @@
     </div>
   </div>
 
-  <ExportProductionActivityModal></ExportProductionActivityModal>
+  <!-- <ExportProductionActivityModal></ExportProductionActivityModal> -->
   <AddProductionActivityModal :tableData="tableData"></AddProductionActivityModal>
   <EditProductionActivityModal :productionActivity="productionActivity" :tableData="tableData"></EditProductionActivityModal>
 </template>
@@ -172,7 +172,7 @@
 import { defineComponent, onMounted, ref } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
-import ExportProductionActivityModal from "@/components/modals/forms/ExportMetricModal.vue";
+// import ExportProductionActivityModal from "@/components/modals/forms/ExportMetricModal.vue";
 import AddProductionActivityModal from "./AddProductionActivityModal.vue";
 import EditProductionActivityModal from "./EditProductionActivityModal.vue";
 import type { IProductionActivity } from "@/core/data/productionActivities";
@@ -194,7 +194,6 @@ export default defineComponent({
   name: "productionActivities-listing",
   components: {
     Datatable,
-    ExportProductionActivityModal,
     AddProductionActivityModal,
     EditProductionActivityModal,
   },
@@ -295,31 +294,31 @@ export default defineComponent({
       deleteModalConfirmation(id);
     };
 
-    const search = ref<string>("");
-    const searchItems = () => {
-      tableData.value.splice(0, tableData.value.length, ...initProductionActivities.value);
-      if (search.value !== "") {
-        let results: Array<IProductionActivity> = [];
-        for (let j = 0; j < tableData.value.length; j++) {
-          if (searchingFunc(tableData.value[j], search.value)) {
-            results.push(tableData.value[j]);
-          }
-        }
-        tableData.value.splice(0, tableData.value.length, ...results);
-      }
-      MenuComponent.reinitialization();
-    };
+    // const search = ref<string>("");
+    // const searchItems = () => {
+    //   tableData.value.splice(0, tableData.value.length, ...initProductionActivities.value);
+    //   if (search.value !== "") {
+    //     let results: Array<IProductionActivity> = [];
+    //     for (let j = 0; j < tableData.value.length; j++) {
+    //       if (searchingFunc(tableData.value[j], search.value)) {
+    //         results.push(tableData.value[j]);
+    //       }
+    //     }
+    //     tableData.value.splice(0, tableData.value.length, ...results);
+    //   }
+    //   MenuComponent.reinitialization();
+    // };
 
-    const searchingFunc = (obj: any, value: string): boolean => {
-      for (let key in obj) {
-        if (!Number.isInteger(obj[key]) && !(typeof obj[key] === "object")) {
-          if (obj[key].indexOf(value) != -1) {
-            return true;
-          }
-        }
-      }
-      return false;
-    };
+    // const searchingFunc = (obj: any, value: string): boolean => {
+    //   for (let key in obj) {
+    //     if (!Number.isInteger(obj[key]) && !(typeof obj[key] === "object")) {
+    //       if (obj[key].indexOf(value) != -1) {
+    //         return true;
+    //       }
+    //     }
+    //   }
+    //   return false;
+    // };
 
     const sort = (sort: Sort) => {
       const reverse: boolean = sort.order === "asc";
@@ -336,8 +335,6 @@ export default defineComponent({
       tableData,
       tableHeader,
       deleteProductionActivity,
-      search,
-      searchItems,
       selectedIds,
       deleteFewProductionActivities,
       sort,
