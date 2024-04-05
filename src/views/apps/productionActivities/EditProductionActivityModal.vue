@@ -209,11 +209,13 @@ export default defineComponent({
             
               if (response.data.status === "fail")  fail(response.data.data);
               else if(response.data.status === "error") error(response.data.message);
-              else{
+              else if (response.data.status === "success"){
                 success("Production activity updated with success!", editProductionActivityModalRef.value);
                 updateProductionActivity(response.data.data);
                 props.productionActivity.value = response.data.data;
                 emit('productionActivityUpdated', props.productionActivity.value);
+              }else{
+                error("Something went wrong, please try again later.", editProductionActivityModalRef.value);
               }
             })();
           }, 2000);

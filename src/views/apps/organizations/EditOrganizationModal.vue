@@ -309,9 +309,11 @@ export default defineComponent({
 
               if (response.data.status === "fail")  fail(response.data.data);
               else if(response.data.status === "error") error(response.data.message);
-              else{
+              else if (response.data.status === "success"){
                 success("Organization updated with success!", editOrganizationModalRef.value);
                 updateOrganization(response.data.data);
+              }else{
+                error("Something went wrong, please try again later.", editOrganizationModalRef.value);
               }
             })();
           }, 2000);

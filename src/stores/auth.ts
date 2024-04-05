@@ -64,9 +64,7 @@ export const useAuthStore = defineStore("auth", () => {
           data = { ...data, username: decodeToken(data.access_token).preferred_username };
           setAuth(data);
         })
-        .catch(({ response }) => {
-          console.log("erro"+response);
-          setError(response.data.errors);
+        .catch(() => {
           purgeAuth();
         });
     }
@@ -133,6 +131,7 @@ export const useAuthStore = defineStore("auth", () => {
     refreshToken,
     verifyAuth,
     decodeToken,
-    setUsername
+    setUsername,
+    purgeAuth
   };
 });

@@ -247,7 +247,6 @@
 <script lang="ts">
 import { defineComponent, ref } from "vue";
 import Swal from "sweetalert2";
-import { hideModal } from "@/core/helpers/modal";
 import ApiService from "@/core/services/ApiService";
 import { validationFormulas } from "@/core/data/validationFormulas";
 import { success, fail, error } from "@/core/helpers/alertModal";
@@ -296,9 +295,11 @@ export default defineComponent({
             
               if (response.data.status === "fail")  fail(response.data.data);
               else if(response.data.status === "error") error(response.data.message);
-              else{
+              else if (response.data.status === "success"){
                 success("The metric was associated with success!", associateProductionActivityModalRef.value);
                 props.tableData?.push(response.data.data);
+              }else{
+                error("Something went wrong, please try again.", associateProductionActivityModalRef.value);
               }
             })();
           }, 2000);

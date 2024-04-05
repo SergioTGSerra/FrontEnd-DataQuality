@@ -306,9 +306,11 @@ export default defineComponent({
             
               if (response.data.status === "fail")  fail(response.data.data);
               else if(response.data.status === "error") error(response.data.message);
-              else{
+              else if (response.data.status === "success"){
                 success("Production activity metric updated with success!", editProductionActivityMetricModalRef.value);
                 updateproductionActivityMetric(response.data.data);
+              }else{
+                error("Something went wrong, please try again later.", editProductionActivityMetricModalRef.value);
               }
             })();
           }, 2000);

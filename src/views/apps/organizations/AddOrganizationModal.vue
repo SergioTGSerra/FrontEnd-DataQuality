@@ -285,9 +285,11 @@ export default defineComponent({
             
               if (response.data.status === "fail")  fail(response.data.data);
               else if(response.data.status === "error") error(response.data.message);
-              else{
+              else if (response.data.status === "success"){
                 success("Organization created with success!", addOrganizationModalRef.value);
                 props.tableData?.push(response.data.data);
+              }else {
+                error("Something went wrong, please try again later.", addOrganizationModalRef.value);
               }
             })();
           }, 2000);

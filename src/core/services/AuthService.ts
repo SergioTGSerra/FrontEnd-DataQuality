@@ -54,6 +54,7 @@ class AuthService {
 
     } catch (error) {
       console.error('Erro ao obter token:', error);
+      return error;
     }
   }
 

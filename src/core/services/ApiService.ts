@@ -3,7 +3,8 @@ import type { AxiosResponse } from "axios";
 import axios from "axios";
 import VueAxios from "vue-axios";
 import JwtService from "@/core/services/JwtService";
-
+import router from '@/router';
+import { useAuthStore } from "@/stores/auth";
 /**
  * @description service to call HTTP request via Axios
  */
@@ -59,9 +60,11 @@ class ApiService {
       return res.then((response) => {
         return response;
       }).catch((error) => {
-        if(error.response.status === 404 || error.response.status === 401){
-          return error.response;
+        if(error.response.status === 401){
+          router.push('/sign-in');
+          useAuthStore().purgeAuth();
         }
+        return error.response;
       });
     }
     return ApiService.vueInstance.axios.get(`${resource}/${slug}`);
@@ -78,6 +81,10 @@ class ApiService {
     return res.then((response) => {
       return response;
     }).catch((error) => {
+      if(error.response.status === 401){
+        router.push('/sign-in'); 
+        useAuthStore().purgeAuth();
+      }
       return error.response;
     });
   }
@@ -98,6 +105,10 @@ class ApiService {
     return res.then((response) => {
       return response;
     }).catch((error) => {
+      if(error.response.status === 401){
+        router.push('/sign-in'); 
+        useAuthStore().purgeAuth();
+      }
       return error.response;
     });
   }
@@ -113,6 +124,10 @@ class ApiService {
     return res.then((response) => {
       return response;
     }).catch((error) => {
+      if(error.response.status === 401){
+        router.push('/sign-in'); 
+        useAuthStore().purgeAuth();
+      }
       return error.response;
     });
   }
@@ -127,6 +142,10 @@ class ApiService {
     return res.then((response) => {
       return response;
     }).catch((error) => {
+      if(error.response.status === 401){
+        router.push('/sign-in'); 
+        useAuthStore().purgeAuth();
+      }
       return error.response;
     });
   }
