@@ -144,7 +144,7 @@
               <!--begin::Input group-->
               <div class="fv-row mb-7">
                 <!--begin::Label-->
-                <label class="required fs-6 fw-semibold mb-2">Min Deg Valid</label>
+                <label class="required fs-6 fw-semibold mb-2">Min Deg Valid (%)</label>
                 <!--end::Label-->
 
                 <!--begin::Input-->
@@ -162,7 +162,7 @@
               <!--begin::Input group-->
               <div class="fv-row mb-7">
                 <!--begin::Label-->
-                <label class="required fs-6 fw-semibold mb-2">Min Deg Suspect</label>
+                <label class="required fs-6 fw-semibold mb-2">Min Deg Suspect (%)</label>
                 <!--end::Label-->
 
                 <!--begin::Input-->
@@ -250,6 +250,7 @@ import Swal from "sweetalert2";
 import ApiService from "@/core/services/ApiService";
 import { validationFormulas } from "@/core/data/validationFormulas";
 import { success, fail, error } from "@/core/helpers/alertModal";
+import { validateMinDeg } from "@/core/helpers/validator";
 
 const response = await ApiService.get("/metric");
 const metrics = response.data.data;
@@ -275,7 +276,14 @@ export default defineComponent({
     });
 
     const rules = ref({
-
+      min: [{ required: true, message: "Please input min", trigger: "blur" }],
+      max: [{ required: true, message: "Please input max", trigger: "blur" }],
+      mean: [{ required: true, message: "Please input mean", trigger: "blur" }],
+      k: [{ required: true, message: "Please input k", trigger: "blur" }],
+      minDegValid: [{ required: true, message: "Please input minDegValid", trigger: "blur" },{ validator: validateMinDeg, trigger: "change" },],
+      minDegSuspect: [{ required: true, message: "Please input minDegSuspect", trigger: "blur" }, { validator: validateMinDeg, trigger: "change" },],
+      validationFormula: [{ required: true, message: "Please input validationFormula", trigger: "blur" },],
+      metricId: [{ required: true, message: "Please select metric", trigger: "change" }],
     });
 
     const submit = () => {
