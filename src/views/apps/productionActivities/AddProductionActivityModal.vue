@@ -128,7 +128,6 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import { hideModal } from "@/core/helpers/modal";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import ApiService from "@/core/services/ApiService";
 import { success, fail, error } from "@/core/helpers/alertModal";
@@ -192,9 +191,11 @@ export default defineComponent({
             
               if (response.data.status === "fail")  fail(response.data.data);
               else if(response.data.status === "error") error(response.data.message);
-              else{
+              else if (response.data.status === "success"){
                 success("Production activity created with success!", addProductionActivityModalRef.value);
                 props.tableData?.push(response.data.data);
+              }else{
+                error("Something went wrong, please try again.", addProductionActivityModalRef.value);
               }
             })();
           }, 2000);

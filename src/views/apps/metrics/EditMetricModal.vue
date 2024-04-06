@@ -235,12 +235,14 @@ export default defineComponent({
 
             (async () => {
               const response = await ApiService.put("/metric/" + metricID, formData.value);
-            
+
               if (response.data.status === "fail")  fail(response.data.data);
               else if(response.data.status === "error") error(response.data.message);
-              else{
+              else if (response.data.status === "success"){
                 success("Organization updated with success!", editMetricModalRef.value);
                 updateMetric(response.data.data);
+              }else {
+                error("Something went wrong, please try again later.", editMetricModalRef.value);
               }
             })();
           }, 2000);

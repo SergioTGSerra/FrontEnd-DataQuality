@@ -32,7 +32,7 @@ function fail(data: any){
     }
 }
 
-function error(data: any){
+function error(data: any, modalRef?: any){
     Swal.fire({
         text: data,
         icon: "error",
@@ -42,6 +42,10 @@ function error(data: any){
         customClass: {
             confirmButton: "btn btn-primary",
         },
+    }).then(() => {
+        if(modalRef){
+            hideModal(modalRef);
+        }
     });
 }
 
