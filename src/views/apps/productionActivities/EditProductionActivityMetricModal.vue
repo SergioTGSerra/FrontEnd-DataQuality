@@ -122,7 +122,7 @@
               <!--begin::Input group-->
               <div class="fv-row mb-7">
                 <!--begin::Label-->
-                <label class="required fs-6 fw-semibold mb-2">Min Degree of Validity</label>
+                <label class="required fs-6 fw-semibold mb-2">Min Degree of Validity (%)</label>
                 <!--end::Label-->
 
                 <!--begin::Input-->
@@ -140,7 +140,7 @@
               <!--begin::Input group-->
               <div class="fv-row mb-7">
                 <!--begin::Label-->
-                <label class="required fs-6 fw-semibold mb-2">Min Suspect of Validity</label>
+                <label class="required fs-6 fw-semibold mb-2">Min Suspect of Validity (%)</label>
                 <!--end::Label-->
 
                 <!--begin::Input-->
@@ -229,6 +229,7 @@ import Swal from "sweetalert2/dist/sweetalert2.js";
 import ApiService from "@/core/services/ApiService";
 import { validationFormulas } from "@/core/data/validationFormulas";
 import { success, fail, error } from "@/core/helpers/alertModal";
+import { validateMinDeg } from "@/core/helpers/validator";
 
 export default defineComponent({
   name: "edit-productionActivityMetric-modal",
@@ -277,8 +278,8 @@ export default defineComponent({
       max: [{ required: true, message: "Max is required", trigger: "change",},],
       mean: [{ required: true, message: "Mean is required", trigger: "change",},],
       k: [{ required: true, message: "K is required", trigger: "change",},],
-      minDegValid: [{ required: true, message: "Min Degree of Validity is required", trigger: "change",},],
-      minDegSuspect: [{ required: true, message: "Min Suspect of Validity is required", trigger: "change",},],
+      minDegValid: [{ required: true, message: "Min Validity is required", trigger: "change" }, { validator: validateMinDeg, trigger: "change" },],
+      minDegSuspect: [{ required: true, message: "Min Suspect of Validity is required", trigger: "change" }, { validator: validateMinDeg, trigger: "change" },],
       validationFormula: [{ required: true, message: "Validation Formula is required", trigger: "change",},],
     });
 

@@ -219,10 +219,10 @@
                 {{ productionActivitiesMetrics.k }}
               </template>
               <template v-slot:minDegValid="{ row: productionActivitiesMetrics }">
-                {{ productionActivitiesMetrics.minDegValid }}
+                {{ productionActivitiesMetrics.minDegValid }}%
               </template>
               <template v-slot:minDegSuspect="{ row: productionActivitiesMetrics }">
-                {{ productionActivitiesMetrics.minDegSuspect }}
+                {{ productionActivitiesMetrics.minDegSuspect }}%
               </template>
               <template v-slot:validationFormula="{ row: productionActivitiesMetrics }">
                 {{ productionActivitiesMetrics.validationFormula }}
