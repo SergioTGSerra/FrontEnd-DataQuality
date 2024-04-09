@@ -290,9 +290,9 @@ export default defineComponent({
               ApiService.delete(`/value-record/${id}`);
               tableData.value = tableData.value.filter((valueRecord) => valueRecord.id !== id.toString());
             }
-            Swal.fire("Deleted!", "Your files have been deleted.", "success");
+            Swal.fire("Deleted!", "Value record have been deleted.", "success");
           } else if (result.dismiss === Swal.DismissReason.cancel) {
-            Swal.fire("Cancelled", "Your files are safe :)", "error");
+            Swal.fire("Cancelled", "Your value records are safe :)", "error");
           }
         });
     }

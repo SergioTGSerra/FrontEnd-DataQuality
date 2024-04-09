@@ -279,9 +279,9 @@ export default defineComponent({
               ApiService.delete(`/production-activity/${id}`);
               tableData.value = tableData.value.filter((productionActivity) => productionActivity.id !== id.toString());
             }
-            Swal.fire("Deleted!", "Your files have been deleted.", "success");
+            Swal.fire("Deleted!", "Production Activity have been deleted.", "success");
           } else if (result.dismiss === Swal.DismissReason.cancel) {
-            Swal.fire("Cancelled", "Your files are safe :)", "error");
+            Swal.fire("Cancelled", "Your Production Activities are safe :)", "error");
           }
         });
     }

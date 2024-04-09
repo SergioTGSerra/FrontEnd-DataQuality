@@ -441,9 +441,9 @@ export default defineComponent({
               ApiService.delete(`/production-activity-metric/${id}/${dynamicRouteId}`);
               tableData.value = tableData.value.filter((productionActivityMetric) => productionActivityMetric.metric.id !== id.toString());
             }
-            Swal.fire("Deleted!", "Your files have been deleted.", "success");
+            Swal.fire("Deleted!", "Production Activity Metric have been deleted.", "success");
           } else if (result.dismiss === Swal.DismissReason.cancel) {
-            Swal.fire("Cancelled", "Your files are safe :)", "error");
+            Swal.fire("Cancelled", "Your Production Activity Metrics are safe :)", "error");
           }
         });
     }
