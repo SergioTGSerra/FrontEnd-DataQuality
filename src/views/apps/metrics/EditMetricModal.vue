@@ -239,7 +239,7 @@ export default defineComponent({
               if (response.data.status === "fail")  fail(response.data.data);
               else if(response.data.status === "error") error(response.data.message);
               else if (response.data.status === "success"){
-                success("Organization updated with success!", editMetricModalRef.value);
+                success("Metric updated with success!", editMetricModalRef.value);
                 updateMetric(response.data.data);
               }else {
                 error("Something went wrong, please try again later.", editMetricModalRef.value);

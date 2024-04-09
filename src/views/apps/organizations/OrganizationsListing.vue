@@ -284,9 +284,9 @@ export default defineComponent({
               ApiService.delete(`/organization/${id}`);
               tableData.value = tableData.value.filter((organization) => organization.id !== id.toString());
             }
-            Swal.fire("Deleted!", "Your files have been deleted.", "success");
+            Swal.fire("Deleted!", "Organization have been deleted.", "success");
           } else if (result.dismiss === Swal.DismissReason.cancel) {
-            Swal.fire("Cancelled", "Your files are safe :)", "error");
+            Swal.fire("Cancelled", "Your organizations are safe :)", "error");
           }
         });
     }

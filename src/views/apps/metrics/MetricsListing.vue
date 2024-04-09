@@ -275,9 +275,9 @@ export default defineComponent({
               ApiService.delete(`/metric/${id}`);
               tableData.value = tableData.value.filter((metric) => metric.id !== id.toString());
             }
-            Swal.fire("Deleted!", "Your files have been deleted.", "success");
+            Swal.fire("Deleted!", "Metric have been deleted.", "success");
           } else if (result.dismiss === Swal.DismissReason.cancel) {
-            Swal.fire("Cancelled", "Your files are safe :)", "error");
+            Swal.fire("Cancelled", "Your metrics are safe :)", "error");
           }
         });
     }
