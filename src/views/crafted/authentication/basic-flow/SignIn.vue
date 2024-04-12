@@ -206,9 +206,11 @@ export default defineComponent({
 
       // Send login request
       await store.login(values);
-      const error = Object.values(store.errors);
 
-      if (error.length === 0) {
+      //const error = Object.values(store.errors);
+      const isAuth = store.isAuthenticated;
+
+      if (isAuth === true) {
         Swal.fire({
           text: "You have successfully logged in!",
           icon: "success",
@@ -224,16 +226,14 @@ export default defineComponent({
         });
       } else {
         Swal.fire({
-          text: error[0] as string,
+          text: "Invalid username or password. Please try again.",
           icon: "error",
           buttonsStyling: false,
-          confirmButtonText: "Try again!",
+          confirmButtonText: "Ok, got it!",
           heightAuto: false,
           customClass: {
-            confirmButton: "btn fw-semibold btn-light-danger",
+            confirmButton: "btn fw-semibold btn-light-primary",
           },
-        }).then(() => {
-          store.errors = {};
         });
       }
 
