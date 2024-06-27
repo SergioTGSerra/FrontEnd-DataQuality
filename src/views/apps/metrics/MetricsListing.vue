@@ -173,12 +173,22 @@ import Swal from "sweetalert2";
 import { useAuthStore } from "@/stores/auth";
 
 const authStore = useAuthStore();
-const response = await ApiService.get("/metric");
+const response = await ApiService.get("/metrics");
 
 if(response.status === 401) authStore.refreshToken();
 
-const metrics = response.data.data;
-const totalItems = response.data.totalElements; 
+const metrics = response.data._embedded.metrics;
+const totalItems = response.data.page.totalElements; 
+
+const IMetrics: IMetric[] = metrics.map(metric => {
+  const id = metric._links.self.href.split('/').pop() as string;
+  return {
+    id,
+    name: metric.name,
+    description: metric.description,
+    unit: metric.unit
+  };
+});
 
 export default defineComponent({
   name: "metrics-listing",
@@ -215,7 +225,7 @@ export default defineComponent({
       },
     ]);
     const selectedIds = ref<Array<number>>([]);
-    const tableData = ref<Array<IMetric>>(metrics? metrics : []);
+    const tableData = ref<Array<IMetric>>(IMetrics? IMetrics : []);
     const metric = ref<Object>([]);
     const initMetrics = ref<Array<IMetric>>([]);
     let current_page = ref<number>(0);
@@ -227,11 +237,11 @@ export default defineComponent({
 
     const getMetrics = async (current_page_param: number, items_per_page_param: number) => {
       if(items_per_page.value !== items_per_page_param){
-        const response = await ApiService.get("metric?page=0&items_per_page=" + items_per_page_param);
-        tableData.value = response.data.data;
+        const response = await ApiService.get("metrics?page=0&size=" + items_per_page_param);
+        tableData.value = response.data._embedded.metrics;
       }else{
-        const response = await ApiService.get("metric?page=" + current_page_param + "&items_per_page=" + items_per_page_param);
-        tableData.value = response.data.data;
+        const response = await ApiService.get("metrics?page=" + current_page_param + "&size=" + items_per_page_param);
+        tableData.value = response.data._embedded.metrics;
       }
     };
 
@@ -267,12 +277,12 @@ export default defineComponent({
 
             if (selectedIds.value.length > 0){
               selectedIds.value.forEach((item) => {
-                ApiService.delete(`/metric/${item}`);
+                ApiService.delete(`/metrics/${item}`);
                 tableData.value = tableData.value.filter((metric) => metric.id !== item.toString());
               });
               selectedIds.value.length = 0;
             }else{
-              ApiService.delete(`/metric/${id}`);
+              ApiService.delete(`/metrics/${id}`);
               tableData.value = tableData.value.filter((metric) => metric.id !== id.toString());
             }
             Swal.fire("Deleted!", "Metric have been deleted.", "success");
