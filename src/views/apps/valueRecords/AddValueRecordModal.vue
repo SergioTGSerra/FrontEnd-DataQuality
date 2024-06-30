@@ -69,37 +69,19 @@
               <!--begin::Input group-->
               <div class="fv-row mb-7">
                 <!--begin::Label-->
-                <label class="required fs-6 fw-semibold mb-2">Lot reference</label>
+                <label class="required fs-6 fw-semibold mb-2">Lot</label>
                 <!--end::Label-->
 
                 <!--begin::Input-->
-                <el-form-item prop="description">
-                  <el-input
-                    v-model="formData.lotReference"
-                    type="text"
-                    placeholder=""
-                  />
-                </el-form-item>
-                <!--end::Input-->
-              </div>
-              <!--end::Input group-->
-
-              <!--begin::Input group-->
-              <div class="fv-row mb-7">
-                <!--begin::Label-->
-                <label class="required fs-6 fw-semibold mb-2">Organization</label>
-                <!--end::Label-->
-
-                <!--begin::Input-->
-                <el-form-item prop="organizationId">
+                <el-form-item prop="lotId">
                   <el-select
-                    v-model="formData.organizationId"
+                    v-model="formData.lotId"
                     placeholder="Select"
                   >
                     <el-option
-                      v-for="item in organizations"
+                      v-for="item in lots"
                       :key="item.id"
-                      :label="item.name"
+                      :label="item.reference"
                       :value="item.id"
                     />
                   </el-select>
@@ -208,14 +190,124 @@ import Swal from "sweetalert2/dist/sweetalert2.js";
 import ApiService from "@/core/services/ApiService";
 import { success, fail, error } from "@/core/helpers/alertModal";
 
-const responseMetrics = await ApiService.get("/metric");
-const metrics = responseMetrics.data.data;
+const responseMetrics = await ApiService.get("/metrics");
+const metrics = responseMetrics.data._embedded.metrics;
 
-const responseOrganizations = await ApiService.get("/organization");
-const organizations = responseOrganizations.data.data;
+const IMetrics: any = metrics.map(metric => {
+  const id = metric._links.self.href.split('/').pop() as string;
+  return {
+    id,
+    name: metric.name,
+    description: metric.description,
+    unit: metric.unit
+  };
+});
 
-const responseProductionActivities = await ApiService.get("/production-activity");
-const productionActivities = responseProductionActivities.data.data;
+const responseLots = await ApiService.get("/lots");
+const lots = responseLots.data._embedded.lots;
+
+const getProductionActivityById = async (id: string) => {
+  try {
+    const response = await ApiService.get(`/lots`, id + `/productionActivity`);
+
+    return response.data;
+  } catch (error) {
+    console.error(`Erro ao carregar o nome do lote: ${error}`);
+    return null;
+  }
+};
+
+const ILots: any = await Promise.all(lots.map(async (lot: any) => {
+  const id = lot._links.self.href.split('/').pop() as string;
+  const productionActivityId = lot._links.productionActivity.href.split('/')[5];
+  const productionActivity = await getProductionActivityById(productionActivityId);
+  return {
+    id,
+    reference: lot.reference,
+    producedQuantity: lot.producedQuantity,
+    productionActivityId : productionActivityId,
+    productionActivityName: productionActivity.name ? productionActivity.name : "",
+  };
+}));
+
+const responseProductionActivities = await ApiService.get("/productionActivities");
+const productionActivities = responseProductionActivities.data._embedded.productionActivities;
+
+const IProductionActivities: any = productionActivities.map(productionActivity => {
+  const id = productionActivity._links.self.href.split('/').pop() as string;
+  return {
+    id,
+    name: productionActivity.name
+  };
+});
+
+const getProductionActivityByRecordId = async (id: string) => {
+  try {
+    const response = await ApiService.get(`/valueRecords`, id + `/productionActivity`);
+
+    return response.data;
+  } catch (error) {
+    console.error(`Erro ao carregar o nome do lote: ${error}`);
+    return null;
+  }
+};
+
+const getOrganizationById = async (id: string) => {
+  try {
+    const response = await ApiService.get(`/valueRecords`, id + `/organization`);
+
+    return response.data;
+  } catch (error) {
+    console.error(`Erro ao carregar o nome do lote: ${error}`);
+    return null;
+  }
+};
+
+const getMetricById = async (id: string) => {
+  try {
+    const response = await ApiService.get(`/valueRecords`, id + `/metric`);
+
+    return response.data;
+  } catch (error) {
+    console.error(`Erro ao carregar o nome do lote: ${error}`);
+    return null;
+  }
+};
+
+const getLotById = async (id: string) => {
+  try {
+    const response = await ApiService.get(`/valueRecords`, id + `/lot`);
+
+    return response.data;
+  } catch (error) {
+    console.error(`Erro ao carregar o nome do lote: ${error}`);
+    return null;
+  }
+};
+
+const convertToIValueRecord = async (valueRecord: any): Promise<any> => {
+  const id = valueRecord._links.self.href.split('/').pop() as string;
+  const productionActivityId = valueRecord._links.productionActivity.href.split('/')[5];
+  const productionActivity = await getProductionActivityByRecordId(productionActivityId);
+  const organizationId = valueRecord._links.organization.href.split('/')[5];
+  const organization = await getOrganizationById(organizationId);
+  const metricId = valueRecord._links.metric.href.split('/')[5];
+  const metric = await getMetricById(metricId);
+  const lotId = valueRecord._links.lot.href.split('/')[5];
+  const lot = await getLotById(lotId);
+
+  return {
+    id,
+    value: valueRecord.value,
+    validityDegree: valueRecord.validityDegree,
+    validityCategory: valueRecord.validityCategory,
+    lot: lot.reference,
+    organization: organization.name,
+    metric: metric.name,
+    productionActivity: productionActivity.name
+  };
+};
+
 
 export default defineComponent({
   name: "add-valueRecord-modal",
@@ -228,8 +320,8 @@ export default defineComponent({
     const addValueRecordModalRef = ref<null | HTMLElement>(null);
     const loading = ref<boolean>(false);
     const formData = ref({
-      value: "",
-      lotReference: "",
+      value: 0,
+      lotId: "",
       organizationId: "",
       metricId: "",
       productionActivityId: ""
@@ -237,8 +329,7 @@ export default defineComponent({
 
     const rules = ref({
       value: [{ required: true, message: "Value is required", trigger: "blur" }],
-      lotReference: [{ required: true, message: "Lot Reference is required", trigger: "blur" }],
-      organizationId: [{ required: true, message: "Organization is required", trigger: "blur" }],
+      lotId: [{ required: true, message: "Lot is required", trigger: "blur" }],
       metricId: [{ required: true, message: "Metric is required", trigger: "blur" }],
       productionActivityId: [{ required: true, message: "Production Activity is required", trigger: "blur" }],
     });
@@ -256,13 +347,21 @@ export default defineComponent({
             loading.value = false;
 
             (async () => {
-              const response = await ApiService.post("/value-record", formData.value);
+              const data = {
+                  value: formData.value.value,
+                  lot: "http://api.med1.ipvc.bioeconomy-at-textiles.com/v1/lots/" + formData.value.lotId,
+                  metric: "http://api.med1.ipvc.bioeconomy-at-textiles.com/v1/metrics/" + formData.value.metricId,
+                  organization: "http://api.med1.ipvc.bioeconomy-at-textiles.com/v1/organizations/88cb5dbf-9ab1-4723-8d83-791c8faef570",
+                  productionActivity: "http://api.med1.ipvc.bioeconomy-at-textiles.com/v1/productionActivities/" + formData.value.productionActivityId
+              };
+
+              const response = await ApiService.post("/valueRecords", data);
             
               if (response.data.status === "fail")  fail(response.data.data);
               else if(response.data.status === "error") error(response.data.message);
-              else if(response.data.status === "success"){
+              else if(response.status === 201){
                 success("Value record created with success!", addValueRecordModalRef.value);
-                props.tableData?.push(response.data.data);
+                props.tableData?.push(await convertToIValueRecord(response.data));
               }else{
                 error("Something went wrong, please try again.", addValueRecordModalRef.value);
               }
@@ -291,9 +390,9 @@ export default defineComponent({
       formRef,
       loading,
       addValueRecordModalRef,
-      metrics,
-      organizations,
-      productionActivities
+      metrics: IMetrics,
+      productionActivities: IProductionActivities,
+      lots: ILots,
     };
   },
 });
