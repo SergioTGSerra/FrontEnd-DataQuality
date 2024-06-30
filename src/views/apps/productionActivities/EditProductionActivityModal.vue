@@ -64,24 +64,6 @@
                 <!--end::Input-->
               </div>
               <!--end::Input group-->
-
-              <!--begin::Input group-->
-              <div class="fv-row mb-7">
-                <!--begin::Label-->
-                <label class="required fs-6 fw-semibold mb-2">Reference</label>
-                <!--end::Label-->
-
-                <!--begin::Input-->
-                <el-form-item prop="reference">
-                  <el-input
-                    v-model="formData.reference"
-                    type="text"
-                    placeholder=""
-                  />
-                </el-form-item>
-                <!--end::Input-->
-              </div>
-              <!--end::Input group-->
             </div>
             <!--end::Scroll-->
           </div>
@@ -143,15 +125,13 @@ export default defineComponent({
     let productionActivityID = ref<String>('');
 
     const formData = ref({
-      name: "",
-      reference: "",
+      name: ""
     });
 
     watch(() => props.productionActivity, (editProductionActivity) => {
       if (editProductionActivity) {
         formData.value = {
-          name: editProductionActivity.name,
-          reference: editProductionActivity.reference,
+          name: editProductionActivity.name
         };
         productionActivityID = editProductionActivity.id;
       }
@@ -167,18 +147,6 @@ export default defineComponent({
         {
           min: 2,
           message: "Production Activity name must be at least 2 characters",
-          trigger: "change",
-        }
-      ],
-      reference: [
-        {
-          required: true,
-          message: "Reference is required",
-          trigger: "change",
-        },
-        {
-          min: 2,
-          message: "Reference must be at least 2 characters",
           trigger: "change",
         }
       ],
@@ -205,14 +173,14 @@ export default defineComponent({
             loading.value = false;
 
             (async () => {
-              const response = await ApiService.put("/production-activity/" + productionActivityID, formData.value);
+              const response = await ApiService.put("/productionActivities/" + productionActivityID, formData.value);
             
               if (response.data.status === "fail")  fail(response.data.data);
               else if(response.data.status === "error") error(response.data.message);
-              else if (response.data.status === "success"){
+              else if (response.status === 200){
                 success("Production activity updated with success!", editProductionActivityModalRef.value);
-                updateProductionActivity(response.data.data);
-                props.productionActivity.value = response.data.data;
+                updateProductionActivity(response.data);
+                props.productionActivity.value = response.data;
                 emit('productionActivityUpdated', props.productionActivity.value);
               }else{
                 error("Something went wrong, please try again later.", editProductionActivityModalRef.value);

@@ -23,10 +23,6 @@
               {{ productionActivity.name }}
             </a>
             <!--end::Name-->
-
-            <!--begin::Position-->
-            <div class="fs-5 fw-semibold text-muted mb-6">{{ productionActivity.reference }}</div>
-            <!--end::Position-->
           </div>
           <!--end::Summary-->
 
@@ -73,10 +69,6 @@
               <!--begin::Details item-->
               <div class="fw-bold">Name</div>
               <div class="text-gray-600">{{ productionActivity.name }}</div>
-              <!--begin::Details item-->
-              <!--begin::Details item-->
-              <div class="fw-bold mt-5">Reference</div>
-              <div class="text-gray-600">{{ productionActivity.reference }}</div>
               <!--begin::Details item-->
             </div>
           </div>
@@ -203,37 +195,37 @@
               :header="tableHeader"
               :enable-items-per-page-dropdown="true"
               :checkbox-enabled="false"
-              checkbox-label="metric.id"
+              checkbox-label=""
               :totalItems="totalItems"
             >
-              <template v-slot:min="{ row: productionActivitiesMetrics }">
-                {{ productionActivitiesMetrics.min }}
+              <template v-slot:min="{ row }">
+                {{ row.min }}
               </template>
-              <template v-slot:max="{ row: productionActivitiesMetrics }">
-                {{ productionActivitiesMetrics.max }}
+              <template v-slot:max="{ row }">
+                {{ row.max }}
               </template>
-              <template v-slot:mean="{ row: productionActivitiesMetrics }">
-                {{ productionActivitiesMetrics.mean }}
+              <template v-slot:mean="{ row }">
+                {{ row.mean }}
               </template>
-              <template v-slot:k="{ row: productionActivitiesMetrics }">
-                {{ productionActivitiesMetrics.k }}
+              <template v-slot:k="{ row }">
+                {{ row.k }}
               </template>
-              <template v-slot:minDegValid="{ row: productionActivitiesMetrics }">
-                {{ productionActivitiesMetrics.minDegValid }}%
+              <template v-slot:minDegValid="{ row }">
+                {{ row.minDegValid }}%
               </template>
-              <template v-slot:minDegSuspect="{ row: productionActivitiesMetrics }">
-                {{ productionActivitiesMetrics.minDegSuspect }}%
+              <template v-slot:minDegSuspect="{ row }">
+                {{ row.minDegSuspect }}%
               </template>
-              <template v-slot:validationFormula="{ row: productionActivitiesMetrics }">
-                {{ productionActivitiesMetrics.validationFormula }}
+              <template v-slot:validationFormula="{ row }">
+                {{ row.validationFormula }}
               </template>
-              <template v-slot:metricName="{ row: productionActivitiesMetrics }">
-                {{ productionActivitiesMetrics.metric.name }}
+              <template v-slot:metricName="{ row }">
+                {{ row.id.metric.name }}
               </template>
-              <template v-slot:actions="{ row: productionActivitiesMetrics }">
+              <template v-slot:actions="{ row }">
                 <!--begin::Edit-->
                 <a
-                  @click="editProductionActivityMetric(productionActivitiesMetrics)"
+                  @click="editProductionActivityMetric(row)"
                   href="#"
                   class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
                   data-bs-toggle="modal"
@@ -251,7 +243,7 @@
                 <!--end::Edit-->
                 <!--begin::Delete-->
                 <a
-                  @click="deleteProductionActivityMetric(productionActivitiesMetrics.metric.id)"
+                  @click="deleteProductionActivityMetric(row.id.metric.id)"
                   href="#"
                   class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
                   data-bs-toggle="tooltip"
@@ -274,7 +266,7 @@
 
   <AssociateProductionActivityToMetricModal :tableData="tableData" :productionActivityId="dynamicRouteId"></AssociateProductionActivityToMetricModal>
   <EditProductionActivityModal :productionActivity="productionActivity" :tableData="tableData" @productionActivityUpdated="editProductionActivity"></EditProductionActivityModal>
-  <EditProductionActivityModalMetric :productionActivitiesMetrics="productionActivitiesMetrics" :productionActivityId="dynamicRouteId" :tableData="tableData"></EditProductionActivityModalMetric>
+  <EditProductionActivityModalMetric :productionActivitiesMetrics="productionActivityMetric" :productionActivityId="dynamicRouteId" :tableData="tableData"></EditProductionActivityModalMetric>
 </template>
 
 <script lang="ts">
@@ -360,6 +352,7 @@ export default defineComponent({
     ]);
     const selectedIds = ref<Array<number>>([]);
     let productionActivitiesMetrics = ref<any>([]);
+    let productionActivityMetric = ref<any>([]);
     let tableData = ref<Array<any>>([]);
     const productionActivity = ref<any>([]);
     const initProductionActivitiesMetrics = ref<Array<any>>([]);
@@ -371,36 +364,55 @@ export default defineComponent({
     
     const loadMetrics = async () => {
       try {
-        const responseMetrics = await ApiService.get("/production-activity/" + dynamicRouteId);
-        productionActivity.value = responseMetrics.data.data;
-        totalItems.value = responseMetrics.data.data.metrics.length;
-        tableData.value = responseMetrics.data.data.metrics;
-        return responseMetrics.data.data.metrics;
+        const responseProductionActivityMetrics = await ApiService.get("/productionActivityMetrics/productionActivity/" + dynamicRouteId);
+        const responseProductionActivity = await ApiService.get("/productionActivities/" + dynamicRouteId);
+        productionActivity.value = responseProductionActivity.data;
+
+        if (Array.isArray(responseProductionActivityMetrics.data)) {
+          const allBodyData = responseProductionActivityMetrics.data.reduce((acc, item) => {
+            return acc.concat(item.body);
+          }, []);
+          return allBodyData;
+        } else {
+          console.error('Expected an array in the response data.');
+          return [];
+        }
       } catch (error) {
         console.error('Erro ao carregar dados da API:', error);
+        return []; 
       }
     };
 
-    productionActivitiesMetrics.value.push(loadMetrics());
-    
+    const loadAndPushMetrics = async () => {
+      const metricsData = await loadMetrics();
+      productionActivitiesMetrics.value.push(...metricsData);
+      tableData.value.push(...metricsData);
+    };
+
+    loadAndPushMetrics();
+
     onMounted(() => {
       initProductionActivitiesMetrics.value.splice(0, tableData.value.length, ...tableData.value);
     });
 
-    const editProductionActivityMetric = (ProductionActivityI: IProductionActivityMetric) => {
-      productionActivitiesMetrics.value = ProductionActivityI;
+    const editProductionActivityMetric = (ProductionActivityI: any) => {
+      productionActivityMetric.value = ProductionActivityI;
     };
 
-    const editProductionActivity = (ProductionActivityI: IProductionActivity) => {
-      productionActivity.value = ProductionActivityI;
+    const editProductionActivity = (ProductionActivityI: any) => {
+      const convertedProductionActivity = {
+        id: ProductionActivityI._links.self.href.split('/').pop() as string,
+        name: ProductionActivityI.name,
+      };
+      productionActivity.value = convertedProductionActivity;
     };
 
     const getProductActivities = async (current_page_param: number, items_per_page_param: number) => {
       if(items_per_page.value !== items_per_page_param){
-        const response = await ApiService.get("production-activity?page=0&items_per_page=" + items_per_page_param);
+        const response = await ApiService.get("production-activity?page=0&size=" + items_per_page_param);
         tableData.value = response.data.data;
       }else{
-        const response = await ApiService.get("production-activity?page=" + current_page_param + "&items_per_page=" + items_per_page_param);
+        const response = await ApiService.get("production-activity?page=" + current_page_param + "&size=" + items_per_page_param);
         tableData.value = response.data.data;
       }
     };
@@ -433,13 +445,13 @@ export default defineComponent({
 
             if (selectedIds.value.length > 0){
               selectedIds.value.forEach((item) => {
-                ApiService.delete(`/production-activity-metric/${item}/${dynamicRouteId}`);
-                tableData.value = tableData.value.filter((productionActivityMetric) => productionActivityMetric.metric.id !== item.toString());
+                ApiService.delete(`/productionActivityMetrics/${dynamicRouteId}/${item}`);
+                tableData.value = tableData.value.filter((productionActivityMetric) => productionActivityMetric.id.metric.id !== item.toString());
               });
               selectedIds.value.length = 0;
             }else{
-              ApiService.delete(`/production-activity-metric/${id}/${dynamicRouteId}`);
-              tableData.value = tableData.value.filter((productionActivityMetric) => productionActivityMetric.metric.id !== id.toString());
+              ApiService.delete(`/productionActivityMetrics/${dynamicRouteId}/${id}`);
+              tableData.value = tableData.value.filter((productionActivityMetric) => productionActivityMetric.id.metric.id !== id.toString());
             }
             Swal.fire("Deleted!", "Production Activity Metric have been deleted.", "success");
           } else if (result.dismiss === Swal.DismissReason.cancel) {
@@ -509,7 +521,8 @@ export default defineComponent({
       totalItems,
       dynamicRouteId,
       editProductionActivity,
-      productionActivitiesMetrics
+      productionActivitiesMetrics,
+      productionActivityMetric
     };
   },
 });

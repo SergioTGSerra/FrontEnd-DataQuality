@@ -111,9 +111,6 @@
         <template v-slot:name="{ row: productionActivity }">
           {{ productionActivity.name }}
         </template>
-        <template v-slot:reference="{ row: productionActivity }">
-          {{ productionActivity.reference }}
-        </template>
         <template v-slot:actions="{ row: productionActivity }">
           <!--begin::View-->
           <a 
@@ -184,11 +181,19 @@ import { useAuthStore } from "@/stores/auth";
 
 const authStore = useAuthStore();
 
-const response = await ApiService.get("/production-activity");
+const response = await ApiService.get("/productionActivities");
 if(response.status === 401) authStore.refreshToken();
 
-const productionActivities = response.data.data;
-const totalItems = response.data.totalElements;
+const productionActivities = response.data._embedded.productionActivities;
+const totalItems = response.data.page.totalElements;
+
+const IProductionActivities: IProductionActivity[] = productionActivities.map(productionActivity => {
+  const id = productionActivity._links.self.href.split('/').pop() as string;
+  return {
+    id,
+    name: productionActivity.name
+  };
+});
 
 export default defineComponent({
   name: "productionActivities-listing",
@@ -206,12 +211,6 @@ export default defineComponent({
         columnWidth: 175,
       },
       {
-        columnName: "Reference",
-        columnLabel: "reference",
-        sortEnabled: true,
-        columnWidth: 175,
-      },
-      {
         columnName: "Actions",
         columnLabel: "actions",
         sortEnabled: false,
@@ -219,7 +218,7 @@ export default defineComponent({
       },
     ]);
     const selectedIds = ref<Array<number>>([]);
-    const tableData = ref<Array<IProductionActivity>>(productionActivities? productionActivities : []);
+    const tableData = ref<Array<IProductionActivity>>(IProductionActivities? IProductionActivities : []);
     const productionActivity = ref<Object>([]);
     const initProductionActivities = ref<Array<IProductionActivity>>([]);
     let current_page = ref<number>(0);
@@ -235,11 +234,11 @@ export default defineComponent({
 
     const getProductActivities = async (current_page_param: number, items_per_page_param: number) => {
       if(items_per_page.value !== items_per_page_param){
-        const response = await ApiService.get("production-activity?page=0&items_per_page=" + items_per_page_param);
-        tableData.value = response.data.data;
+        const response = await ApiService.get("productionActivities?page=0&size=" + items_per_page_param);
+        tableData.value = response.data._embedded.productionActivities;
       }else{
-        const response = await ApiService.get("production-activity?page=" + current_page_param + "&items_per_page=" + items_per_page_param);
-        tableData.value = response.data.data;
+        const response = await ApiService.get("productionActivities?page=" + current_page_param + "&size=" + items_per_page_param);
+        tableData.value = response.data._embedded.productionActivities;
       }
     };
 
@@ -271,12 +270,12 @@ export default defineComponent({
 
             if (selectedIds.value.length > 0){
               selectedIds.value.forEach((item) => {
-                ApiService.delete(`/production-activity/${item}`);
+                ApiService.delete(`/productionActivities/${item}`);
                 tableData.value = tableData.value.filter((productionActivity) => productionActivity.id !== item.toString());
               });
               selectedIds.value.length = 0;
             }else{
-              ApiService.delete(`/production-activity/${id}`);
+              ApiService.delete(`/productionActivities/${id}`);
               tableData.value = tableData.value.filter((productionActivity) => productionActivity.id !== id.toString());
             }
             Swal.fire("Deleted!", "Production Activity have been deleted.", "success");
