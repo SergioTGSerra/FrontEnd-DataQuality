@@ -35,6 +35,12 @@ const MainMenuConfig: Array<MenuItem> = [
         bootstrapIcon: "bi-app-indicator",
       },
       {
+        heading: "Lots",
+        route: "/lots",
+        keenthemesIcon: "parcel",
+        bootstrapIcon: "bi-app-indicator",
+      },
+      {
         heading: "Value Records",
         route: "/valueRecords",
         keenthemesIcon: "chart-line",

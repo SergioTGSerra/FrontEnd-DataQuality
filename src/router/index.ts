@@ -67,6 +67,14 @@ const routes: Array<RouteRecordRaw> = [
         },
       },  
       {
+        path: "/lots",
+        name: "Lots",
+        component: () => import("@/views/apps/lots/LotsListing.vue"),
+        meta: {
+          pageTitle: "Lots",
+        },
+      },
+      {
         path: "/valueRecords",
         name: "Value Records",
         component: () => import("@/views/apps/valueRecords/ValueRecordsListing.vue"),
