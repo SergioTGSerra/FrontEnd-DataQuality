@@ -75,6 +75,14 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
+        path: "/typeOfMaterials",
+        name: "Type of Materials",
+        component: () => import("@/views/apps/typeOfMaterials/TypeOfMaterialsListing.vue"),
+        meta: {
+          pageTitle: "Type of Materials",
+        },
+      },
+      {
         path: "/valueRecords",
         name: "Value Records",
         component: () => import("@/views/apps/valueRecords/ValueRecordsListing.vue"),
