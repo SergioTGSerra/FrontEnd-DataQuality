@@ -7,7 +7,7 @@
         icon-name="parcel"
         color="dark"
         icon-color="white"
-        :title="totalValueRecords"
+        :title="totalLots"
         :description="translate('lots')"
       ></StatisticsWidget5>
     </div>
@@ -58,18 +58,19 @@ import { useAuthStore } from "@/stores/auth";
 const store = useAuthStore();
 const User = store.user;
 
-const responseMetrics = await ApiService.get("/metrics");
-const totalMetrics = responseMetrics.data.page.totalElements; 
-
-const responseProductionActivities = await ApiService.get("/productionActivities");
-const totalProductionActivities = responseProductionActivities.data.page.totalElements; 
-
 const totalOrganizations = ref("");
+const totalMetrics = ref("");
 
 if(User.username === "admin"){
   const responseOrganizations = await ApiService.get("/organizations");
   totalOrganizations.value  = responseOrganizations.data.page.totalElements; 
+
+  const responseMetrics = await ApiService.get("/metrics");
+  totalMetrics.value = responseMetrics.data.page.totalElements;
 }
+
+const responseLots = await ApiService.get("/lots");
+const totalLots = responseLots.data.page.totalElements;
 
 const responseValueRecords = await ApiService.get("/valueRecords");
 const totalValueRecords = responseValueRecords.data.page.totalElements; 
@@ -93,7 +94,7 @@ export default defineComponent({
     return {
       getAssetPath,
       totalMetrics,
-      totalProductionActivities,
+      totalLots,
       totalOrganizations,
       totalValueRecords,
       translate,
