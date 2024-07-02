@@ -8,8 +8,8 @@
     <div class="menu-item px-3">
       <div class="menu-content d-flex align-items-center px-3">
         <!--begin::Avatar-->
-        <div class="symbol symbol-50px me-5">
-          <img alt="Logo" :src="getAssetPath('media/avatars/300-3.jpg')" />
+        <div class="symbol symbol-47  px me-5">
+          <img alt="Logo" :src="getAssetPath('media/logos/beat_bg.png')" />
         </div>
         <!--end::Avatar-->
 
@@ -160,7 +160,7 @@
     >
       <router-link to="/pages/profile/overview" class="menu-link px-5">
         <span class="menu-title position-relative">
-          Language
+          {{ translate('language') }}
           <span
             class="fs-8 rounded bg-light px-3 py-2 position-absolute translate-middle-y top-50 end-0"
           >
@@ -192,6 +192,26 @@
               />
             </span>
             English
+          </a>
+        </div>
+        <!--end::Menu item-->
+
+        <!--begin::Menu item-->
+        <div class="menu-item px-3">
+          <a
+            @click="setLang('pt')"
+            href="#"
+            class="menu-link d-flex px-5"
+            :class="{ active: currentLanguage === 'pt' }"
+          >
+            <span class="symbol symbol-20px me-4">
+              <img
+                class="rounded-1"
+                :src="getAssetPath('media/flags/portugal.svg')"
+                alt="metronic"
+              />
+            </span>
+            Portuguese
           </a>
         </div>
         <!--end::Menu item-->
@@ -290,7 +310,7 @@
 
     <!--begin::Menu item-->
     <div class="menu-item px-5">
-      <a @click="signOut()" class="menu-link px-5"> Sign Out </a>
+      <a @click="signOut()" class="menu-link px-5"> {{ translate('signOut') }} </a>
     </div>
     <!--end::Menu item-->
   </div>
@@ -313,6 +333,16 @@ export default defineComponent({
     const store = useAuthStore();
     const User = store.user;
 
+    const { t, te } = useI18n();
+
+    const translate = (text: string) => {
+      if (te(text)) {
+        return t(text);
+      } else {
+        return text;
+      }
+    };
+
     i18n.locale.value = localStorage.getItem("lang")
       ? (localStorage.getItem("lang") as string)
       : "en";
@@ -321,6 +351,10 @@ export default defineComponent({
       en: {
         flag: getAssetPath("media/flags/united-states.svg"),
         name: "English",
+      },
+      pt: {
+        flag: getAssetPath("media/flags/portugal.svg"),
+        name: "Portuguese",
       },
       es: {
         flag: getAssetPath("media/flags/spain.svg"),
@@ -365,7 +399,8 @@ export default defineComponent({
       currentLangugeLocale,
       countries,
       getAssetPath,
-      User
+      User,
+      translate
     };
   },
 });

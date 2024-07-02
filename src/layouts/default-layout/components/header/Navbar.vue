@@ -80,7 +80,7 @@
         data-kt-menu-placement="bottom-end"
       >
         <img
-          :src="getAssetPath('media/avatars/300-3.jpg')"
+          :src="getAssetPath('media/logos/beat_bg.png')"
           class="rounded-3"
           alt="user"
         />
@@ -90,7 +90,7 @@
     </div>
     <!--end::User menu-->
     <!--begin::Header menu toggle-->
-    <div
+    <!-- <div
       class="app-navbar-item d-lg-none ms-2 me-n2"
       v-tooltip
       title="Show header menu"
@@ -101,7 +101,7 @@
       >
         <KTIcon icon-name="element-4" icon-class="fs-2" />
       </div>
-    </div>
+    </div> -->
     <!--end::Header menu toggle-->
   </div>
   <!--end::Navbar-->

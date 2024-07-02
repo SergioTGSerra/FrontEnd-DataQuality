@@ -47,7 +47,7 @@
             data-bs-target="#kt_modal_add_metric"
           >
             <KTIcon icon-name="plus" icon-class="fs-2" />
-            Add Metric
+            {{ translate("addMetric")}}
           </button>
           <!--end::Add metric-->
         </div>
@@ -171,6 +171,7 @@ import { MenuComponent } from "@/assets/ts/components";
 import ApiService from "@/core/services/ApiService";
 import Swal from "sweetalert2";
 import { useAuthStore } from "@/stores/auth";
+import { useI18n } from "vue-i18n";
 
 const authStore = useAuthStore();
 const response = await ApiService.get("/metrics");
@@ -198,27 +199,37 @@ export default defineComponent({
     EditMetricModal,
   },
   setup() {
+    const { t, te } = useI18n();
+
+    const translate = (text: string) => {
+      if (te(text)) {
+        return t(text);
+      } else {
+        return text;
+      }
+    };
+
     const tableHeader = ref([
       {
-        columnName: "Name",
+        columnName: translate('name'),
         columnLabel: "name",
         sortEnabled: true,
         columnWidth: 175,
       },
       {
-        columnName: "Description",
+        columnName: translate('description'),
         columnLabel: "description",
         sortEnabled: true,
         columnWidth: 230,
       },
       {
-        columnName: "Unit",
+        columnName: translate('unit'),
         columnLabel: "unit",
         sortEnabled: true,
         columnWidth: 175,
       },
       {
-        columnName: "Actions",
+        columnName: translate('actions'),
         columnLabel: "actions",
         sortEnabled: false,
         columnWidth: 135,
@@ -350,7 +361,8 @@ export default defineComponent({
       currentPage,
       itemsPerPage,
       totalItems,
-      initMetrics
+      initMetrics,
+      translate
     };
   },
 });
