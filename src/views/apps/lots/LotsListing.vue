@@ -118,6 +118,19 @@
           {{ lot.productionActivityName }}
         </template>
         <template v-slot:actions="{ row: lot }"> 
+          <!--begin::View-->
+          <a 
+            href=""
+            class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
+            title="View"
+          >
+            <router-link
+              :to="`/lots/${lot.id}`"
+            >
+              <KTIcon icon-name="eye" icon-class="fs-3" />
+            </router-link>
+          </a> 
+          <!--end::View-->
           <!--begin::Edit-->
           <a
               @click="editLot(lot)"

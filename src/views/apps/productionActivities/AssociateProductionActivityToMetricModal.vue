@@ -325,7 +325,6 @@ export default defineComponent({
               };
 
               const response = await ApiService.post("/productionActivityMetrics", data);
-              console.log(response);
             
               if (response.data.status === "fail")  fail(response.data.data);
               else if(response.data.status === "error") error(response.data.message);

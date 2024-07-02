@@ -75,6 +75,14 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
+        path: "/lots/:id",
+        name: "Lot Details",
+        component: () => import("@/views/apps/lots/LotDetails.vue"),
+        meta: {
+          pageTitle: "Lot Details",
+        },
+      }, 
+      {
         path: "/typeOfMaterials",
         name: "Type of Materials",
         component: () => import("@/views/apps/typeOfMaterials/TypeOfMaterialsListing.vue"),
