@@ -178,9 +178,13 @@ export default defineComponent({
               if (response.data.status === "fail")  fail(response.data.data);
               else if(response.data.status === "error") error(response.data.message);
               else if (response.status === 200){
+                const data = {
+                  id: response.data._links.self.href.split("/").pop(),
+                  name: response.data.name
+                };
                 success("Production activity updated with success!", editProductionActivityModalRef.value);
-                updateProductionActivity(response.data);
-                props.productionActivity.value = response.data;
+                updateProductionActivity(data);
+                props.productionActivity.value = data;
                 emit('productionActivityUpdated', props.productionActivity.value);
               }else{
                 error("Something went wrong, please try again later.", editProductionActivityModalRef.value);

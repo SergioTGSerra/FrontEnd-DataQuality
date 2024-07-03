@@ -161,8 +161,12 @@ export default defineComponent({
               if (response.data.status === "fail")  fail(response.data.data);
               else if(response.data.status === "error") error(response.data.message);
               else if (response.status === 201){
+                const data = {
+                  id: response.data._links.self.href.split("/").pop(),
+                  name: response.data.name
+                };
                 success("Production activity created with success!", addProductionActivityModalRef.value);
-                props.tableData?.push(response.data);
+                props.tableData?.push(data);
               }else{
                 error("Something went wrong, please try again.", addProductionActivityModalRef.value);
               }

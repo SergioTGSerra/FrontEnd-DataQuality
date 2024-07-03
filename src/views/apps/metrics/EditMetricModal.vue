@@ -249,8 +249,14 @@ export default defineComponent({
               if (response.data.status === "fail")  fail(response.data.data);
               else if(response.data.status === "error") error(response.data.message);
               else if (response.status === 200){
+                const data = {
+                  id: response.data._links.self.href.split("/").pop(),
+                  name: response.data.name,
+                  description: response.data.description,
+                  unit: response.data.unit,
+                };
                 success("Metric updated with success!", editMetricModalRef.value);
-                updateMetric(response.data);
+                updateMetric(data);
               }else {
                 error("Something went wrong, please try again later.", editMetricModalRef.value);
               }
