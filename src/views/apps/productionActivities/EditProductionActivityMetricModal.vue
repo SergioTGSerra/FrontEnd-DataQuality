@@ -266,10 +266,10 @@ export default defineComponent({
           minDegSuspect: editproductionActivityMetric.minDegSuspect,
           validationFormula: editproductionActivityMetric.validationFormula,
           productionActivityId: props.productionActivityId,
-          metricId: editproductionActivityMetric.metric.id,
+          metricId: editproductionActivityMetric.id.metric.id,
         };
         productionActivityId = props.productionActivityId;
-        metricId = editproductionActivityMetric.metric.id;
+        metricId = editproductionActivityMetric.id.metric.id;
       }
     });
 
@@ -284,7 +284,7 @@ export default defineComponent({
     });
 
     const updateproductionActivityMetric = (productionActivityMetric) => {
-      const index = props.tableData.findIndex((item: any) => item.metric.id === metricId);
+      const index = props.tableData.findIndex((item: any) => item.id.metric.id === metricId);
       if (index !== -1) {
         props.tableData[index] = productionActivityMetric;
       }
@@ -303,13 +303,28 @@ export default defineComponent({
             loading.value = false;
 
             (async () => {
-              const response = await ApiService.put("/production-activity-metric/" + metricId + "/" + productionActivityId, formData.value);
+              const data = {
+                id: {
+                  productionActivity: "http://api.med1.ipvc.bioeconomy-at-textiles.com/v1/productionActivities/" + props.productionActivityId,
+                  metric: "http://api.med1.ipvc.bioeconomy-at-textiles.com/v1/metrics/" + formData.value.metricId
+                },
+                min: formData.value.min.toString(),
+                max: formData.value.max.toString(),
+                mean: formData.value.mean.toString(),
+                k: formData.value.k.toString(),
+                minDegValid: formData.value.minDegValid.toString(),
+                minDegSuspect: formData.value.minDegSuspect.toString(),
+                validationFormula: formData.value.validationFormula,
+              };
+
+              const response = await ApiService.put("/productionActivityMetrics/" +productionActivityId + "/" + metricId, data);
             
               if (response.data.status === "fail")  fail(response.data.data);
               else if(response.data.status === "error") error(response.data.message);
-              else if (response.data.status === "success"){
+              else if (response.status === 200){
                 success("Production activity metric updated with success!", editProductionActivityMetricModalRef.value);
-                updateproductionActivityMetric(response.data.data);
+                console.log(response.data);
+                updateproductionActivityMetric(response.data);
               }else{
                 error("Something went wrong, please try again later.", editProductionActivityMetricModalRef.value);
               }

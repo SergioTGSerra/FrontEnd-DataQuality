@@ -1,6 +1,6 @@
 <template>
   <!--begin::Statistics Widget 5-->
-  <a href="#" :class="[widgetClasses, `bg-${color}`]" class="card hoverable">
+  <a :href="link" :class="[widgetClasses, `bg-${color}`]" class="card hoverable">
     <!--begin::Body-->
     <div class="card-body">
       <KTIcon
@@ -34,6 +34,7 @@ export default defineComponent({
     iconName: String,
     title: String,
     description: String,
+    link: String,
   },
   components: {},
   setup() {

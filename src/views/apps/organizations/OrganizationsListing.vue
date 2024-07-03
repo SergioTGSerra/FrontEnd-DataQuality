@@ -177,11 +177,22 @@ import { useAuthStore } from "@/stores/auth";
 
 const authStore = useAuthStore();
 
-const response = await ApiService.get("/organization");
+const response = await ApiService.get("/organizations");
 if(response.status === 401) authStore.refreshToken();
 
-const organizations = response.data.data;
-const totalItems = response.data.totalElements;
+const organizations = response.data._embedded.organizations;
+const totalItems = response.data.page.totalElements; 
+
+const IOrganizations: IOrganization[] = organizations.map(organization => {
+  const id = organization._links.self.href.split('/').pop() as string;
+  return {
+    id: id,
+    name: organization.name,
+    orgCode: organization.orgCode,
+    eac: organization.eac,
+    country: organization.country,
+  };
+});
 
 export default defineComponent({
   name: "organizations-listing",
@@ -224,7 +235,7 @@ export default defineComponent({
       },
     ]);
     const selectedIds = ref<Array<number>>([]);
-    const tableData = ref<Array<IOrganization>>(organizations? organizations : []);
+    const tableData = ref<Array<IOrganization>>(IOrganizations? IOrganizations : []);
     const organization = ref<Object>([]);
     const initOrganizations = ref<Array<IOrganization>>([]);
     let current_page = ref<number>(0);
@@ -240,11 +251,11 @@ export default defineComponent({
 
     const getOrganizations = async (current_page_param: number, items_per_page_param: number) => {
       if(items_per_page.value !== items_per_page_param){
-        const response = await ApiService.get("organization?page=0&items_per_page=" + items_per_page_param);
-        tableData.value = response.data.data;
+        const response = await ApiService.get("organizations?page=0&size=" + items_per_page_param);
+        tableData.value = response.data._embedded.organizations;
       }else{
-        const response = await ApiService.get("organization?page=" + current_page_param + "&items_per_page=" + items_per_page_param);
-        tableData.value = response.data.data;
+        const response = await ApiService.get("organizations?page=" + current_page_param + "&size=" + items_per_page_param);
+        tableData.value = response.data._embedded.organizations;
       }
     };
 
@@ -276,12 +287,12 @@ export default defineComponent({
 
             if (selectedIds.value.length > 0){
               selectedIds.value.forEach((item) => {
-                ApiService.delete(`/organization/${item}`);
+                ApiService.delete(`/organizations/${item}`);
                 tableData.value = tableData.value.filter((organization) => organization.id !== item.toString());
               });
               selectedIds.value.length = 0;
             }else{
-              ApiService.delete(`/organization/${id}`);
+              ApiService.delete(`/organizations/${id}`);
               tableData.value = tableData.value.filter((organization) => organization.id !== id.toString());
             }
             Swal.fire("Deleted!", "Organization have been deleted.", "success");

@@ -20,7 +20,7 @@
               href="#"
               class="fs-3 text-gray-800 text-hover-primary fw-bold mb-1"
             >
-              {{ productionActivity.name }}
+              {{ lot.reference }}
             </a>
             <!--end::Name-->
           </div>
@@ -31,10 +31,10 @@
             <div
               class="fw-bold rotate collapsible"
               data-bs-toggle="collapse"
-              href="#kt_productionActivityMetric_view_details"
+              href="#kt_lotTypeOfMaterial_view_details"
               role="button"
               aria-expanded="false"
-              aria-controls="kt_productionActivityMetric_view_details"
+              aria-controls="kt_lotTypeOfMaterial_view_details"
             >
               Details
               <span class="ms-2 rotate-180">
@@ -42,33 +42,37 @@
               </span>
             </div>
 
-            <span
+            <!-- <span
               data-bs-toggle="tooltip"
               data-bs-trigger="hover"
-              title="Edit productionActivityMetric details"
+              title="Edit lot Type of Material details"
             >
               <a
                 href="#"
-                @click="editProductionActivity(productionActivity)"
-                @change="editProductionActivity(productionActivity)"
+                @click="editLot(lot)"
+                @change="editLot(lot)"
                 class="btn btn-sm btn-light-primary"
                 data-bs-toggle="modal"
-                data-bs-target="#kt_modal_edit_productionActivity"
+                data-bs-target="#kt_modal_edit_lot"
               >
                 Edit
               </a>
-            </span>
+            </span> -->
           </div>
           <!--end::Details toggle-->
 
           <div class="separator separator-dashed my-3"></div>
 
           <!--begin::Details content-->
-          <div id="kt_productionActivityMetric_view_details" class="collapse show">
+          <div id="kt_lotTypeOfMaterial_view_details" class="collapse show">
             <div class="py-5 fs-6">
               <!--begin::Details item-->
-              <div class="fw-bold">Name</div>
-              <div class="text-gray-600">{{ productionActivity.name }}</div>
+              <div class="fw-bold">Reference</div>
+              <div class="text-gray-600">{{ lot.reference }}</div>
+              <!--begin::Details item-->
+              <!--begin::Details item-->
+              <div class="fw-bold pt-3">Produced Quantity </div>
+              <div class="text-gray-600">{{ lot.producedQuantity }}</div>
               <!--begin::Details item-->
             </div>
           </div>
@@ -91,7 +95,7 @@
           <a
             class="nav-link text-active-primary pb-4 active"
             data-bs-toggle="tab"
-            >Metrics</a
+            >Lots Percentages</a
           >
         </li>
         <!--end:::Tab item-->
@@ -127,26 +131,26 @@
               <div
                 v-if="selectedIds.length === 0"
                 class="d-flex justify-content-end"
-                data-kt-productionActivityMetric-table-toolbar="base"
+                data-kt-lotTypeOfMaterial-table-toolbar="base"
               >
-                <!--begin::Add productionActivityMetric-->
+                <!--begin::Add lotTypeOfMaterial-->
                 <button
                   type="button"
                   class="btn btn-primary"
                   data-bs-toggle="modal"
-                  data-bs-target="#kt_modal_associate_productionActivity"
+                  data-bs-target="#kt_modal_associate_lotTypeOfMaterial"
                 >
                   <KTIcon icon-name="plus" icon-class="fs-2" />
-                  Associate Metric To Production Activity
+                  Associate Lot To Type of Material
                 </button>
-                <!--end::Add productionActivityMetric-->
+                <!--end::Add lotTypeOfMaterial-->
               </div>
               <!--end::Toolbar-->
               <!--begin::Group actions-->
               <div
                 v-else
                 class="d-flex justify-content-end align-items-center"
-                data-kt-productionActivityMetric-table-toolbar="selected"
+                data-kt-lotTypeOfMaterial-table-toolbar="selected"
               >
                 <div class="fw-bold me-5">
                   <span class="me-2">{{ selectedIds.length }}</span
@@ -155,7 +159,7 @@
                 <button
                   type="button"
                   class="btn btn-danger"
-                  @click="deleteFewProductionActivities()"
+                  @click="deleteFewLotTypeMaterials()"
                 >
                   Delete Selected
                 </button>
@@ -164,19 +168,19 @@
               <!--begin::Group actions-->
               <div
                 class="d-flex justify-content-end align-items-center d-none"
-                data-kt-productionActivityMetric-table-toolbar="selected"
+                data-kt-lotTypeOfMaterial-table-toolbar="selected"
               >
                 <div class="fw-bold me-5">
                   <span
                     class="me-2"
-                    data-kt-productionActivityMetric-table-select="selected_count"
+                    data-kt-lotTypeOfMaterial-table-select="selected_count"
                   ></span
                   >Selected
                 </div>
                 <button
                   type="button"
                   class="btn btn-danger"
-                  data-kt-productionActivityMetric-table-select="delete_selected"
+                  data-kt-lotTypeOfMaterial-table-select="delete_selected"
                 >
                   Delete Selected
                 </button>
@@ -198,38 +202,23 @@
               checkbox-label=""
               :totalItems="totalItems"
             >
-              <template v-slot:min="{ row }">
-                {{ row.min }}
+              <template v-slot:typeOfMaterialName="{ row }">
+                {{ row.id.typeOfMaterial.name  }}
               </template>
-              <template v-slot:max="{ row }">
-                {{ row.max }}
+              <template v-slot:LotReference="{ row }">
+                {{ row.id.lot.reference}}
               </template>
-              <template v-slot:mean="{ row }">
-                {{ row.mean }}
-              </template>
-              <template v-slot:k="{ row }">
-                {{ row.k }}
-              </template>
-              <template v-slot:minDegValid="{ row }">
-                {{ row.minDegValid }}%
-              </template>
-              <template v-slot:minDegSuspect="{ row }">
-                {{ row.minDegSuspect }}%
-              </template>
-              <template v-slot:validationFormula="{ row }">
-                {{ row.validationFormula }}
-              </template>
-              <template v-slot:metricName="{ row }">
-                {{ row.id.metric.name }}
+              <template v-slot:percentage="{ row }">
+                {{ row.percentage}}
               </template>
               <template v-slot:actions="{ row }">
                 <!--begin::Edit-->
                 <a
-                  @click="editProductionActivityMetric(row)"
+                  @click="editLotTypeOfMaterial(row)"
                   href="#"
                   class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
                   data-bs-toggle="modal"
-                  data-bs-target="#kt_modal_edit_productionActivityMetric"
+                  data-bs-target="#kt_modal_edit_lotTypeOfMaterial"
                   title="Edit"
                 >
                   <span
@@ -243,7 +232,7 @@
                 <!--end::Edit-->
                 <!--begin::Delete-->
                 <a
-                  @click="deleteProductionActivityMetric(row.id.metric.id)"
+                  @click="deleteLotTypeMaterial(row.id.typeOfMaterial.id)"
                   href="#"
                   class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
                   data-bs-toggle="tooltip"
@@ -264,9 +253,9 @@
   </div>
   <!--end::Layout-->
 
-  <AssociateProductionActivityToMetricModal :tableData="tableData" :productionActivityId="dynamicRouteId"></AssociateProductionActivityToMetricModal>
-  <EditProductionActivityModal :productionActivity="productionActivity" :tableData="tableData" @productionActivityUpdated="editProductionActivity"></EditProductionActivityModal>
-  <EditProductionActivityModalMetric :productionActivitiesMetrics="productionActivityMetric" :productionActivityId="dynamicRouteId" :tableData="tableData"></EditProductionActivityModalMetric>
+  <AssociateLotToTypeOfMaterialModal :tableData="tableData" :lotId="dynamicRouteId"></AssociateLotToTypeOfMaterialModal>
+  <EditLotModal :lot="lot" :tableData="tableData" @lotUpdated="editLot"></EditLotModal>
+  <EditLotTypeOfMaterialModal :lotTypeOfMaterial="lotTypeOfMaterial" :lotId="dynamicRouteId" :tableData="tableData"></EditLotTypeOfMaterialModal>
 </template>
 
 <script lang="ts">
@@ -274,11 +263,9 @@ import { getAssetPath } from "@/core/helpers/assets";
 import { defineComponent, onMounted, ref, watch } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
-import AssociateProductionActivityToMetricModal from "./AssociateProductionActivityToMetricModal.vue";
-import EditProductionActivityModal from "./EditProductionActivityModal.vue";
-import EditProductionActivityModalMetric from "./EditProductionActivityMetricModal.vue";
-import type { IProductionActivity } from "@/core/data/productionActivities";
-import type { IProductionActivityMetric } from "@/core/data/productionActivitiesMetrics";
+import AssociateLotToTypeOfMaterialModal from "./AssociateLotToTypeOfMaterialModal.vue";
+import EditLotModal from "./EditLotModal.vue";
+import EditLotTypeOfMaterialModal from "./EditLotTypeOfMaterialModal.vue";
 import arraySort from "array-sort";
 import { MenuComponent } from "@/assets/ts/components";
 import ApiService from "@/core/services/ApiService";
@@ -286,62 +273,32 @@ import Swal from "sweetalert2";
 import { useRoute } from "vue-router";
 
 export default defineComponent({
-  name: "production-activities-details",
+  name: "lot-details",
   components: {
     Datatable,
-    AssociateProductionActivityToMetricModal,
-    EditProductionActivityModal,
-    EditProductionActivityModalMetric,
+    AssociateLotToTypeOfMaterialModal,
+    EditLotModal,
+    EditLotTypeOfMaterialModal,
   },
   setup() {
     const tableHeader = ref([
       {
-        columnName: "Min",
-        columnLabel: "min",
-        sortEnabled: true,
-        columnWidth: 135,
-      },
-      {
-        columnName: "Max",
-        columnLabel: "max",
-        sortEnabled: true,
-        columnWidth: 135,
-      },
-      {
-        columnName: "Mean",
-        columnLabel: "mean",
-        sortEnabled: true,
-        columnWidth: 135,
-      },
-      {
-        columnName: "K",
-        columnLabel: "k",
-        sortEnabled: true,
-        columnWidth: 135,
-      },
-      {
-        columnName: "Min Deg Valid",
-        columnLabel: "minDegValid",
-        sortEnabled: true,
-        columnWidth: 175,
-      },
-      {
-        columnName: "Min Deg Suspect",
-        columnLabel: "minDegSuspect",
-        sortEnabled: true,
-        columnWidth: 175,
-      },
-      {
-        columnName: "Validation Formula",
-        columnLabel: "validationFormula",
+        columnName: "Type of Material Name",
+        columnLabel: "typeOfMaterialName",
         sortEnabled: true,
         columnWidth: 175,
       },  
       {
-        columnName: "Metric Name",
-        columnLabel: "metricName",
+        columnName: "Lot Reference",
+        columnLabel: "LotReference",
         sortEnabled: true,
         columnWidth: 175,
+      },
+      {
+        columnName: "Percentage",
+        columnLabel: "percentage",
+        sortEnabled: true,
+        columnWidth: 135,
       },
       {
         columnName: "Actions",
@@ -351,25 +308,25 @@ export default defineComponent({
       },
     ]);
     const selectedIds = ref<Array<number>>([]);
-    let productionActivitiesMetrics = ref<any>([]);
-    let productionActivityMetric = ref<any>([]);
+    let lotTypeOfMaterials = ref<any>([]);
+    let lotTypeOfMaterial = ref<any>([]);
     let tableData = ref<Array<any>>([]);
-    const productionActivity = ref<any>([]);
-    const initProductionActivitiesMetrics = ref<Array<any>>([]);
+    const lot = ref<any>([]);
+    const initLotTypeOfMaterials= ref<Array<any>>([]);
     let current_page = ref<number>(0);
     let items_per_page = ref<number>(10);
     let totalItems = ref<number>(0);
     const $route = useRoute();
     const dynamicRouteId = $route.params?.id ?? '';
     
-    const loadMetrics = async () => {
+    const loadLots = async () => {
       try {
-        const responseProductionActivityMetrics = await ApiService.get("/productionActivityMetrics/productionActivity/" + dynamicRouteId);
-        const responseProductionActivity = await ApiService.get("/productionActivities/" + dynamicRouteId);
-        productionActivity.value = responseProductionActivity.data;
+        const responseLotTypeOfMaterials = await ApiService.get("/lotTypeMaterialPercentages/lot/" + dynamicRouteId);
+        const responseLot = await ApiService.get("/lots/" + dynamicRouteId);
+        lot.value = responseLot.data;
 
-        if (Array.isArray(responseProductionActivityMetrics.data)) {
-          const allBodyData = responseProductionActivityMetrics.data.reduce((acc, item) => {
+        if (Array.isArray(responseLotTypeOfMaterials.data)) {
+          const allBodyData = responseLotTypeOfMaterials.data.reduce((acc, item) => {
             return acc.concat(item.body);
           }, []);
           return allBodyData;
@@ -383,48 +340,48 @@ export default defineComponent({
       }
     };
 
-    const loadAndPushMetrics = async () => {
-      const metricsData = await loadMetrics();
-      productionActivitiesMetrics.value.push(...metricsData);
-      tableData.value.push(...metricsData);
+    const loadAndPushLots = async () => {
+      const lotsData = await loadLots();
+      lotTypeOfMaterials.value.push(...lotsData);
+      tableData.value.push(...lotsData);
     };
 
-    loadAndPushMetrics();
+    loadAndPushLots();
 
     onMounted(() => {
-      initProductionActivitiesMetrics.value.splice(0, tableData.value.length, ...tableData.value);
+      initLotTypeOfMaterials.value.splice(0, tableData.value.length, ...tableData.value);
     });
 
-    const editProductionActivityMetric = (ProductionActivityI: any) => {
-      productionActivityMetric.value = ProductionActivityI;
+    const editLotTypeOfMaterial = (lotI: any) => {
+      lotTypeOfMaterial.value = lotI;
     };
 
-    const editProductionActivity = (ProductionActivityI: any) => {
-      const convertedProductionActivity = {
-        id: ProductionActivityI._links.self.href.split('/').pop() as string,
-        name: ProductionActivityI.name,
+    const editLot = (lotI: any) => {
+      const convertedLot = {
+        id: lotI._links.self.href.split('/').pop() as string,
+        name: lotI.name,
       };
-      productionActivity.value = convertedProductionActivity;
+      lotTypeOfMaterial.value = convertedLot;
     };
 
-    const getProductActivities = async (current_page_param: number, items_per_page_param: number) => {
+    const getLotTypeOfMaterial = async (current_page_param: number, items_per_page_param: number) => {
       if(items_per_page.value !== items_per_page_param){
-        const response = await ApiService.get("production-activity?page=0&size=" + items_per_page_param);
-        tableData.value = response.data.data;
+        //const response = await ApiService.get("production-activity?page=0&size=" + items_per_page_param);
+        //tableData.value = response.data.data;
       }else{
-        const response = await ApiService.get("production-activity?page=" + current_page_param + "&size=" + items_per_page_param);
-        tableData.value = response.data.data;
+        //const response = await ApiService.get("production-activity?page=" + current_page_param + "&size=" + items_per_page_param);
+        //tableData.value = response.data.data;
       }
     };
 
     const currentPage = (page: any) => {
       page = page - 1;
-      getProductActivities(page, items_per_page.value);
+      //getLotTypeOfMaterial(page, items_per_page.value);
       current_page.value = page;
     };
 
     const itemsPerPage = (items: any) => {
-      getProductActivities(current_page.value, items);
+      //getLotTypeOfMaterial(current_page.value, items);
       items_per_page.value = items;
     };
 
@@ -445,26 +402,26 @@ export default defineComponent({
 
             if (selectedIds.value.length > 0){
               selectedIds.value.forEach((item) => {
-                ApiService.delete(`/productionActivityMetrics/${dynamicRouteId}/${item}`);
-                tableData.value = tableData.value.filter((productionActivityMetric) => productionActivityMetric.id.metric.id !== item.toString());
+                ApiService.delete(`/lotTypeMaterialPercentages/${dynamicRouteId}/${item}`);
+                tableData.value = tableData.value.filter((lotTypeMaterialPercentage) => lotTypeMaterialPercentage.id.typeOfMaterial.id !== item.toString());
               });
               selectedIds.value.length = 0;
             }else{
-              ApiService.delete(`/productionActivityMetrics/${dynamicRouteId}/${id}`);
-              tableData.value = tableData.value.filter((productionActivityMetric) => productionActivityMetric.id.metric.id !== id.toString());
+              ApiService.delete(`/lotTypeMaterialPercentages/${dynamicRouteId}/${id}`);
+              tableData.value = tableData.value.filter((lotTypeMaterialPercentage) => lotTypeMaterialPercentage.id.typeOfMaterial.id !== id.toString());
             }
-            Swal.fire("Deleted!", "Production Activity Metric have been deleted.", "success");
+            Swal.fire("Deleted!", "Lot Type Material have been deleted.", "success");
           } else if (result.dismiss === Swal.DismissReason.cancel) {
-            Swal.fire("Cancelled", "Your Production Activity Metrics are safe :)", "error");
+            Swal.fire("Cancelled", "Your Lot Type Material are safe :)", "error");
           }
         });
     }
 
-    const deleteFewProductionActivities = () => {
+    const deleteFewLotTypeMaterials = () => {
       deleteModalConfirmation();
     };
 
-    const deleteProductionActivityMetric = (id: number) => {
+    const deleteLotTypeMaterial= (id: number) => {
       deleteModalConfirmation(id);
     };
 
@@ -508,21 +465,21 @@ export default defineComponent({
     return {
       tableData,
       tableHeader,
-      deleteProductionActivityMetric,
+      deleteLotTypeMaterial,
       selectedIds,
-      deleteFewProductionActivities,
+      deleteFewLotTypeMaterials,
       sort,
       onItemSelect,
-      editProductionActivityMetric,
-      productionActivity,
+      editLotTypeOfMaterial,
+      lot,
       currentPage,
       itemsPerPage,
       getAssetPath,
       totalItems,
       dynamicRouteId,
-      editProductionActivity,
-      productionActivitiesMetrics,
-      productionActivityMetric
+      editLot,
+      lotTypeOfMaterials,
+      lotTypeOfMaterial
     };
   },
 });

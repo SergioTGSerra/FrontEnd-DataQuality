@@ -13,7 +13,7 @@
         <!--begin::Modal header-->
         <div class="modal-header" id="kt_modal_add_metric_header">
           <!--begin::Modal title-->
-          <h2 class="fw-bold">Add a Metric</h2>
+          <h2 class="fw-bold">{{ translate('addMetric') }}</h2>
           <!--end::Modal title-->
 
           <!--begin::Close-->
@@ -50,7 +50,7 @@
               <!--begin::Input group-->
               <div class="fv-row mb-7">
                 <!--begin::Label-->
-                <label class="required fs-6 fw-semibold mb-2">Name</label>
+                <label class="required fs-6 fw-semibold mb-2">{{ translate('name') }}</label>
                 <!--end::Label-->
 
                 <!--begin::Input-->
@@ -68,7 +68,7 @@
               <!--begin::Input group-->
               <div class="fv-row mb-7">
                 <!--begin::Label-->
-                <label class="required fs-6 fw-semibold mb-2">Description</label>
+                <label class="required fs-6 fw-semibold mb-2">{{ translate('description') }}</label>
                 <!--end::Label-->
 
                 <!--begin::Input-->
@@ -86,7 +86,7 @@
               <!--begin::Input group-->
               <div class="fv-row mb-7">
                 <!--begin::Label-->
-                <label class="required fs-6 fw-semibold mb-2">Unit</label>
+                <label class="required fs-6 fw-semibold mb-2">{{ translate('unit') }}</label>
                 <!--end::Label-->
 
                 <!--begin::Input-->
@@ -115,7 +115,7 @@
               id="kt_modal_add_metric_cancel"
               class="btn btn-light me-3"
             >
-              Discard
+            {{ translate('discard') }}
             </button>
             <!--end::Button-->
 
@@ -126,7 +126,7 @@
               type="submit"
             >
               <span v-if="!loading" class="indicator-label">
-                Submit
+                {{ translate('submit') }}
                 <KTIcon icon-name="arrow-right" icon-class="fs-2 me-2 me-0" />
               </span>
               <span v-if="loading" class="indicator-progress">
@@ -151,6 +151,7 @@ import { defineComponent, ref } from "vue";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import ApiService from "@/core/services/ApiService";
 import { success, fail, error } from "@/core/helpers/alertModal";
+import { useI18n } from "vue-i18n";
 
 export default defineComponent({
   name: "add-metric-modal",
@@ -159,6 +160,15 @@ export default defineComponent({
     tableData: Array,
   },
   setup(props) {
+    const { t, te } = useI18n();
+
+    const translate = (text: string) => {
+      if (te(text)) {
+        return t(text);
+      } else {
+        return text;
+      }
+    };
     const formRef = ref<null | HTMLFormElement>(null);
     const addMetricModalRef = ref<null | HTMLElement>(null);
     const loading = ref<boolean>(false);
@@ -215,13 +225,19 @@ export default defineComponent({
             loading.value = false;
 
             (async () => {
-              const response = await ApiService.post("/metric", formData.value);
+              const response = await ApiService.post("/metrics", formData.value);
             
               if (response.data.status === "fail")  fail(response.data.data);
               else if(response.data.status === "error") error(response.data.message);
-              else if(response.data.status === "success"){
+              else if(response.status === 201){
+                const data = {
+                  id: response.data._links.self.href.split("/").pop(),
+                  name: response.data.name,
+                  description: response.data.description,
+                  unit: response.data.unit,
+                };
                 success("Metric created with success!", addMetricModalRef.value);
-                props.tableData?.push(response.data.data);
+                props.tableData?.push(data);
               }else{
                 error("Something went wrong, please try again later.", addMetricModalRef.value);
               }
@@ -250,6 +266,7 @@ export default defineComponent({
       formRef,
       loading,
       addMetricModalRef,
+      translate
     };
   },
 });

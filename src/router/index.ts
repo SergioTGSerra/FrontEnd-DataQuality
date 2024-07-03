@@ -21,8 +21,8 @@ const routes: Array<RouteRecordRaw> = [
         name: "dashboard",
         component: () => import("@/views/Dashboard.vue"),
         meta: {
-          pageTitle: "Dashboard",
-          breadcrumbs: ["Dashboards"],
+          pageTitle: "dashboard",
+          breadcrumbs: ["dashboard"],
         },
       },
       {
@@ -39,7 +39,7 @@ const routes: Array<RouteRecordRaw> = [
         name: "metrics",
         component: () => import("@/views/apps/metrics/MetricsListing.vue"),
         meta: {
-          pageTitle: "Metrics",
+          pageTitle: "metrics",
         },
       },
       {
@@ -47,7 +47,7 @@ const routes: Array<RouteRecordRaw> = [
         name: "production Activity",
         component: () => import("@/views/apps/productionActivities/productionActivitiesListing.vue"),
         meta: {
-          pageTitle: "Production Activity",
+          pageTitle: "productionsActivities",
         },
       },  
       {
@@ -63,15 +63,39 @@ const routes: Array<RouteRecordRaw> = [
         name: "organization",
         component: () => import("@/views/apps/organizations/OrganizationsListing.vue"),
         meta: {
-          pageTitle: "Organizations",
+          pageTitle: "organizations",
         },
       },  
+      {
+        path: "/lots",
+        name: "Lots",
+        component: () => import("@/views/apps/lots/LotsListing.vue"),
+        meta: {
+          pageTitle: "lots",
+        },
+      },
+      {
+        path: "/lots/:id",
+        name: "Lot Details",
+        component: () => import("@/views/apps/lots/LotDetails.vue"),
+        meta: {
+          pageTitle: "Lot Details",
+        },
+      }, 
+      {
+        path: "/typeOfMaterials",
+        name: "Type of Materials",
+        component: () => import("@/views/apps/typeOfMaterials/TypeOfMaterialsListing.vue"),
+        meta: {
+          pageTitle: "typeOfMaterials",
+        },
+      },
       {
         path: "/valueRecords",
         name: "Value Records",
         component: () => import("@/views/apps/valueRecords/ValueRecordsListing.vue"),
         meta: {
-          pageTitle: "Value Records",
+          pageTitle: "valueRecords",
         },
       },  
       /*

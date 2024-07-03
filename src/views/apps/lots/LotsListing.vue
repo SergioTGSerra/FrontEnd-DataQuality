@@ -14,7 +14,7 @@
             v-model="search"
             @input="searchItems()"
             class="form-control form-control-solid w-250px ps-15"
-            placeholder="Search Metrics"
+            placeholder="Search Lots"
           />
         </div> -->
         <!--end::Search-->
@@ -26,37 +26,37 @@
         <div
           v-if="selectedIds.length === 0"
           class="d-flex justify-content-end"
-          data-kt-metric-table-toolbar="base"
+          data-kt-lot-table-toolbar="base"
         >
           <!--begin::Export-->
           <!-- <button
             type="button"
             class="btn btn-light-primary me-3"
             data-bs-toggle="modal"
-            data-bs-target="#kt_metrics_export_modal"
+            data-bs-target="#kt_lots_export_modal"
           >
             <KTIcon icon-name="exit-up" icon-class="fs-2" />
             Export
           </button> -->
           <!--end::Export-->
-          <!--begin::Add metric-->
+          <!--begin::Add lot-->
           <button
             type="button"
             class="btn btn-primary"
             data-bs-toggle="modal"
-            data-bs-target="#kt_modal_add_metric"
+            data-bs-target="#kt_modal_add_lot"
           >
             <KTIcon icon-name="plus" icon-class="fs-2" />
-            {{ translate("addMetric")}}
+            Add Lot
           </button>
-          <!--end::Add metric-->
+          <!--end::Add lot-->
         </div>
         <!--end::Toolbar-->
         <!--begin::Group actions-->
         <div
           v-else
           class="d-flex justify-content-end align-items-center"
-          data-kt-metric-table-toolbar="selected"
+          data-kt-lot-table-toolbar="selected"
         >
           <div class="fw-bold me-5">
             <span class="me-2">{{ selectedIds.length }}</span
@@ -65,7 +65,7 @@
           <button
             type="button"
             class="btn btn-danger"
-            @click="deleteFewMetrics()"
+            @click="deleteFewLots()"
           >
             Delete Selected
           </button>
@@ -74,19 +74,19 @@
         <!--begin::Group actions-->
         <div
           class="d-flex justify-content-end align-items-center d-none"
-          data-kt-metric-table-toolbar="selected"
+          data-kt-lot-table-toolbar="selected"
         >
           <div class="fw-bold me-5">
             <span
               class="me-2"
-              data-kt-metric-table-select="selected_count"
+              data-kt-lot-table-select="selected_count"
             ></span
             >Selected
           </div>
           <button
             type="button"
             class="btn btn-danger"
-            data-kt-metric-table-select="delete_selected"
+            data-kt-lot-table-select="delete_selected"
           >
             Delete Selected
           </button>
@@ -108,23 +108,36 @@
         checkbox-label="id"
         :totalItems="totalItems"
       >
-        <template v-slot:name="{ row: metric }">
-          {{ metric.name }}
+        <template v-slot:reference="{ row: lot }">
+          {{ lot.reference }}
         </template>
-        <template v-slot:description="{ row: metric }">
-          {{ metric.description }}
+        <template v-slot:producedQuantity="{ row: lot }">
+          {{ lot.producedQuantity }}
         </template>
-        <template v-slot:unit="{ row: metric }">
-          {{ metric.unit }}
+        <template v-slot:productionActivity="{ row: lot }">
+          {{ lot.productionActivityName }}
         </template>
-        <template v-slot:actions="{ row: metric }"> 
+        <template v-slot:actions="{ row: lot }"> 
+          <!--begin::View-->
+          <a 
+            href=""
+            class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
+            title="View"
+          >
+            <router-link
+              :to="`/lots/${lot.id}`"
+            >
+              <KTIcon icon-name="eye" icon-class="fs-3" />
+            </router-link>
+          </a> 
+          <!--end::View-->
           <!--begin::Edit-->
           <a
-              @click="editMetric(metric)"
+              @click="editLot(lot)"
               href="#"
               class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
               data-bs-toggle="modal"
-              data-bs-target="#kt_modal_edit_metric"
+              data-bs-target="#kt_modal_edit_lot"
               title="Edit"
             >
               <span
@@ -138,7 +151,7 @@
           <!--end::Edit-->
           <!--begin::Delete-->
           <a
-            @click="deleteMetric(metric.id)"
+            @click="deleteLot(lot.id)"
             href="#"
             class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
             data-bs-toggle="tooltip"
@@ -153,122 +166,126 @@
     </div>
   </div>
 
-  <!-- <ExportMetricModal></ExportMetricModal> -->
-  <AddMetricModal :tableData="tableData"></AddMetricModal>
-  <EditMetricModal :metric="metric" :tableData="tableData"></EditMetricModal>
+  <!-- <ExportLotModal></ExportLotModal> -->
+  <AddLotModal :tableData="tableData"></AddLotModal>
+  <EditLotModal :lot="lot" :tableData="tableData"></EditLotModal>
 </template>
 
 <script lang="ts">
 import { defineComponent, onMounted, ref } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
-// import ExportMetricModal from "@/components/modals/forms/ExportMetricModal.vue";
-import AddMetricModal from "@/views/apps/metrics/AddMetricModal.vue";
-import EditMetricModal from "./EditMetricModal.vue";
-import type { IMetric } from "@/core/data/metrics";
+// import ExportLotModal from "@/components/modals/forms/ExportLotModal.vue";
+import AddLotModal from "./AddLotModal.vue";
+import EditLotModal from "./EditLotModal.vue";
 import arraySort from "array-sort";
 import { MenuComponent } from "@/assets/ts/components";
 import ApiService from "@/core/services/ApiService";
 import Swal from "sweetalert2";
 import { useAuthStore } from "@/stores/auth";
-import { useI18n } from "vue-i18n";
+//import { ILot } from "@/core/data/lots";
 
 const authStore = useAuthStore();
-const response = await ApiService.get("/metrics");
+const response = await ApiService.get("/lots");
 
 if(response.status === 401) authStore.refreshToken();
 
-const metrics = response.data._embedded.metrics;
+const lots = response.data._embedded.lots;
 const totalItems = response.data.page.totalElements; 
 
-const IMetrics: IMetric[] = metrics.map(metric => {
-  const id = metric._links.self.href.split('/').pop() as string;
+const getProductionActivityById = async (id: string) => {
+  try {
+    const response = await ApiService.get(`/lots`, id + `/productionActivity`);
+
+    return response.data;
+  } catch (error) {
+    console.error(`Erro ao carregar o nome do lote: ${error}`);
+    return null;
+  }
+};
+
+const ILots: any = await Promise.all(lots.map(async (lot: any) => {
+  const id = lot._links.self.href.split('/').pop() as string;
+  const productionActivityId = lot._links.productionActivity.href.split('/')[5];
+  const productionActivity = await getProductionActivityById(productionActivityId);
   return {
     id,
-    name: metric.name,
-    description: metric.description,
-    unit: metric.unit
+    reference: lot.reference,
+    producedQuantity: lot.producedQuantity,
+    productionActivityId : productionActivityId,
+    productionActivityName: productionActivity.name ? productionActivity.name : "",
   };
-});
+}));
 
 export default defineComponent({
-  name: "metrics-listing",
+  name: "lots-listing",
   components: {
     Datatable,
-    AddMetricModal,
-    EditMetricModal,
+    AddLotModal,
+    EditLotModal,
   },
   setup() {
-    const { t, te } = useI18n();
-
-    const translate = (text: string) => {
-      if (te(text)) {
-        return t(text);
-      } else {
-        return text;
-      }
-    };
-
     const tableHeader = ref([
       {
-        columnName: translate('name'),
-        columnLabel: "name",
+        columnName: "Reference",
+        columnLabel: "reference",
         sortEnabled: true,
         columnWidth: 175,
       },
       {
-        columnName: translate('description'),
-        columnLabel: "description",
+        columnName: "Produced Quantity",
+        columnLabel: "producedQuantity",
         sortEnabled: true,
         columnWidth: 230,
       },
       {
-        columnName: translate('unit'),
-        columnLabel: "unit",
+        columnName: "Production Activity",
+        columnLabel: "productionActivity",
         sortEnabled: true,
         columnWidth: 175,
       },
       {
-        columnName: translate('actions'),
+        columnName: "Actions",
         columnLabel: "actions",
         sortEnabled: false,
         columnWidth: 135,
       },
     ]);
     const selectedIds = ref<Array<number>>([]);
-    const tableData = ref<Array<IMetric>>(IMetrics? IMetrics : []);
-    const metric = ref<Object>([]);
-    const initMetrics = ref<Array<IMetric>>([]);
+    const tableData = ref<Array<any>>(ILots? ILots : []);
+    const productionActivity = ref<Object>([]);
+    const lot = ref<Object>([]);
+    const initLots = ref<Array<any>>([]);
     let current_page = ref<number>(0);
     let items_per_page = ref<number>(10);
 
     onMounted(() => {
-      initMetrics.value.splice(0, tableData.value.length, ...tableData.value);
+      initLots.value.splice(0, tableData.value.length, ...tableData.value);
     });
 
-    const getMetrics = async (current_page_param: number, items_per_page_param: number) => {
+    const getLots = async (current_page_param: number, items_per_page_param: number) => {
       if(items_per_page.value !== items_per_page_param){
-        const response = await ApiService.get("metrics?page=0&size=" + items_per_page_param);
-        tableData.value = response.data._embedded.metrics;
+        const response = await ApiService.get("lots?page=0&size=" + items_per_page_param);
+        tableData.value = response.data._embedded.lots;
       }else{
-        const response = await ApiService.get("metrics?page=" + current_page_param + "&size=" + items_per_page_param);
-        tableData.value = response.data._embedded.metrics;
+        const response = await ApiService.get("lots?page=" + current_page_param + "&size=" + items_per_page_param);
+        tableData.value = response.data._embedded.lots;
       }
     };
 
     const currentPage = (page: any) => {
       page = page - 1;
-      getMetrics(page, items_per_page.value);
+      getLots(page, items_per_page.value);
       current_page.value = page;
     };
 
     const itemsPerPage = (items: any) => {
-      getMetrics(current_page.value, items);
+      getLots(current_page.value, items);
       items_per_page.value = items;
     };
 
-    const editMetric = (metricI: IMetric) => {
-      metric.value = metricI;
+    const editLot = (lotI: any) => {
+      lot.value = lotI;
     };
 
     const deleteModalConfirmation = (id?: any) => {
@@ -288,34 +305,34 @@ export default defineComponent({
 
             if (selectedIds.value.length > 0){
               selectedIds.value.forEach((item) => {
-                ApiService.delete(`/metrics/${item}`);
-                tableData.value = tableData.value.filter((metric) => metric.id !== item.toString());
+                ApiService.delete(`/lots/${item}`);
+                tableData.value = tableData.value.filter((lot) => lot.id !== item.toString());
               });
               selectedIds.value.length = 0;
             }else{
-              ApiService.delete(`/metrics/${id}`);
-              tableData.value = tableData.value.filter((metric) => metric.id !== id.toString());
+              ApiService.delete(`/lots/${id}`);
+              tableData.value = tableData.value.filter((lot) => lot.id !== id.toString());
             }
-            Swal.fire("Deleted!", "Metric have been deleted.", "success");
+            Swal.fire("Deleted!", "Lot have been deleted.", "success");
           } else if (result.dismiss === Swal.DismissReason.cancel) {
-            Swal.fire("Cancelled", "Your metrics are safe :)", "error");
+            Swal.fire("Cancelled", "Your lots are safe :)", "error");
           }
         });
     }
 
-    const deleteFewMetrics = () => {
+    const deleteFewLots = () => {
       deleteModalConfirmation();
     };
 
-    const deleteMetric = (id: number) => {
+    const deleteLot = (id: number) => {
       deleteModalConfirmation(id);
     };
 
     // const search = ref<string>("");
     // const searchItems = () => {
-    //   tableData.value.splice(0, tableData.value.length, ...initMetrics.value);
+    //   tableData.value.splice(0, tableData.value.length, ...initLots.value);
     //   if (search.value !== "") {
-    //     let results: Array<IMetric> = [];
+    //     let results: Array<ILot> = [];
     //     for (let j = 0; j < tableData.value.length; j++) {
     //       if (searchingFunc(tableData.value[j], search.value)) {
     //         results.push(tableData.value[j]);
@@ -351,18 +368,17 @@ export default defineComponent({
     return {
       tableData,
       tableHeader,
-      deleteMetric,
+      deleteLot,
       selectedIds,
-      deleteFewMetrics,
+      deleteFewLots,
       sort,
       onItemSelect,
-      editMetric,
-      metric,
+      editLot,
+      lot,
       currentPage,
       itemsPerPage,
       totalItems,
-      initMetrics,
-      translate
+      initLots
     };
   },
 });

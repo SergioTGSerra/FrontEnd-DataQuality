@@ -111,23 +111,26 @@
         <template v-slot:value="{ row: valueRecord }">
           {{ valueRecord.value }}
         </template>
+        <template v-slot:datetime="{ row: valueRecord }">
+          {{ formatDateString(valueRecord.datetime) }}
+        </template>
         <template v-slot:validityDegree="{ row: valueRecord }">
-            {{ valueRecord.validityDegree.toFixed(2) }}%
+            {{ valueRecord.validityDegree.toFixed(2)*100 }}%
         </template>
         <template v-slot:validityCategory="{ row: valueRecord }">
           {{ valueRecord.validityCategory }}
         </template>
-        <template v-slot:lotReference="{ row: valueRecord }">
-          {{ valueRecord.lotReference }}
+        <template v-slot:lot="{ row: valueRecord }">
+          {{ valueRecord.lot }}
         </template>
         <template v-slot:metric="{ row: valueRecord }">
-          {{ valueRecord.metric.name }}
+          {{ valueRecord.metric }}
         </template>
         <template v-slot:productionActivity="{ row: valueRecord }">
-          {{ valueRecord.productionActivity.name }}
+          {{ valueRecord.productionActivity }}
         </template>
         <template v-slot:organization="{ row: valueRecord }">
-          {{ valueRecord.organization.name }}
+          {{ valueRecord.organization }}
         </template>
         <template v-slot:actions="{ row: valueRecord }">
           <!--begin::Delete-->
@@ -162,14 +165,82 @@ import Swal from "sweetalert2";
 import type { IValueRecord } from "@/core/data/valueRecords";
 import { useAuthStore } from "@/stores/auth";
 import KTIcon from "@/core/helpers/kt-icon/KTIcon.vue";
+import { formatDateString } from "@/core/helpers/dateFormatter";
 
 const authStore = useAuthStore();
 
-const response = await ApiService.get("/value-record");
+const response = await ApiService.get("/valueRecords");
 if(response.status === 401) authStore.refreshToken();
 
-const valueRecords = response.data.data;
-const totalItems = response.data.totalElements; 
+const valueRecords = response.data._embedded.valueRecords;
+const totalItems = response.data.page.totalElements;
+
+const getProductionActivityById = async (id: string) => {
+  try {
+    const response = await ApiService.get(`/valueRecords`, id + `/productionActivity`);
+
+    return response.data;
+  } catch (error) {
+    console.error(`Erro ao carregar o nome do lote: ${error}`);
+    return null;
+  }
+};
+
+const getOrganizationById = async (id: string) => {
+  try {
+    const response = await ApiService.get(`/valueRecords`, id + `/organization`);
+
+    return response.data;
+  } catch (error) {
+    console.error(`Erro ao carregar o nome do lote: ${error}`);
+    return null;
+  }
+};
+
+const getMetricById = async (id: string) => {
+  try {
+    const response = await ApiService.get(`/valueRecords`, id + `/metric`);
+
+    return response.data;
+  } catch (error) {
+    console.error(`Erro ao carregar o nome do lote: ${error}`);
+    return null;
+  }
+};
+
+const getLotById = async (id: string) => {
+  try {
+    const response = await ApiService.get(`/valueRecords`, id + `/lot`);
+
+    return response.data;
+  } catch (error) {
+    console.error(`Erro ao carregar o nome do lote: ${error}`);
+    return null;
+  }
+};
+
+const IValueRecords: any = await Promise.all(valueRecords.map( async (valueRecord) => {
+  const id = valueRecord._links.self.href.split('/').pop() as string;
+  const productionActivityId = valueRecord._links.productionActivity.href.split('/')[5];
+  const productionActivity = await getProductionActivityById(productionActivityId);
+  const organizationId = valueRecord._links.organization.href.split('/')[5];
+  const organization = await getOrganizationById(organizationId);
+  const metricId = valueRecord._links.metric.href.split('/')[5];
+  const metric = await getMetricById(metricId);
+  const lotId = valueRecord._links.lot.href.split('/')[5];
+  const lot = await getLotById(lotId);
+  return {
+    id,
+    value: valueRecord.value,
+    datetime: valueRecord.datetime,
+    validityDegree: valueRecord.validityDegree,
+    validityCategory: valueRecord.validityCategory,
+    lot: lot.reference,
+    organization: organization.name,
+    metric: metric.name,
+    productionActivity: productionActivity.name,
+  };
+}));
 
 export default defineComponent({
   name: "valueRecords-listing",
@@ -183,45 +254,50 @@ export default defineComponent({
         columnName: "Value",
         columnLabel: "value",
         sortEnabled: true,
+        columnWidth: 125,
+      },
+      {
+        columnName: "Datetime",
+        columnLabel: "datetime",
+        sortEnabled: true,
         columnWidth: 175,
       },
       {
         columnName: "Validity Degree",
         columnLabel: "validityDegree",
         sortEnabled: true,
-        columnWidth: 175,
+        columnWidth: 130,
       },
       {
         columnName: "Validity Category",
         columnLabel: "validityCategory",
         sortEnabled: true,
-        columnWidth: 175,
+        columnWidth: 145,
       },
       {
-        columnName: "Lot Reference",
-        columnLabel: "lotReference",
+        columnName: "Lot",
+        columnLabel: "lot",
         sortEnabled: true,
-        columnWidth: 175,
+        columnWidth: 165,
       },
       {
         columnName: "Organization",
         columnLabel: "organization",
         sortEnabled: true,
-        columnWidth: 175,
+        columnWidth: 165,
       },
       {
         columnName:"Metric",
         columnLabel: "metric",
         sortEnabled: true,
-        columnWidth: 175,
+        columnWidth: 165,
       },
       {
         columnName: "Production Activity",
         columnLabel: "productionActivity",
         sortEnabled: true,
-        columnWidth: 175,
+        columnWidth: 165,
       },
-
       {
         columnName: "Actions",
         columnLabel: "actions",
@@ -230,7 +306,7 @@ export default defineComponent({
       },
     ]);
     const selectedIds = ref<Array<number>>([]);
-    const tableData = ref<Array<IValueRecord>>(valueRecords? valueRecords : []);
+    const tableData = ref<Array<IValueRecord>>(IValueRecords? IValueRecords : []);
     const valueRecord = ref<Object>([]);
     const initValueRecords = ref<Array<IValueRecord>>([]);
     let current_page = ref<number>(0);
@@ -242,11 +318,61 @@ export default defineComponent({
 
     const getValueRecords = async (current_page_param: number, items_per_page_param: number) => {
       if(items_per_page.value !== items_per_page_param){
-        const response = await ApiService.get("value-record?page=0&items_per_page=" + items_per_page_param);
-        tableData.value = response.data.data;
+        const response = await ApiService.get("valueRecordspage=0&size=" + items_per_page_param);
+        const valueRecords = response.data._embedded.valueRecords;
+
+        const IValueRecords: any = await Promise.all(valueRecords.map( async (valueRecord) => {
+          const id = valueRecord._links.self.href.split('/').pop() as string;
+          const productionActivityId = valueRecord._links.productionActivity.href.split('/')[5];
+          const productionActivity = await getProductionActivityById(productionActivityId);
+          const organizationId = valueRecord._links.organization.href.split('/')[5];
+          const organization = await getOrganizationById(organizationId);
+          const metricId = valueRecord._links.metric.href.split('/')[5];
+          const metric = await getMetricById(metricId);
+          const lotId = valueRecord._links.lot.href.split('/')[5];
+          const lot = await getLotById(lotId);
+          return {
+            id,
+            value: valueRecord.value,
+            datetime: valueRecord.datetime,
+            validityDegree: valueRecord.validityDegree,
+            validityCategory: valueRecord.validityCategory,
+            lot: lot.reference,
+            organization: organization.name,
+            metric: metric.name,
+            productionActivity: productionActivity.name,
+          };
+        }));
+
+        tableData.value = IValueRecords;
       }else{
-        const response = await ApiService.get("value-record?page=" + current_page_param + "&items_per_page=" + items_per_page_param);
-        tableData.value = response.data.data;
+        const response = await ApiService.get("valueRecords?page=" + current_page_param + "&size=" + items_per_page_param);
+        const valueRecords = response.data._embedded.valueRecords;
+
+        const IValueRecords: any = await Promise.all(valueRecords.map( async (valueRecord) => {
+          const id = valueRecord._links.self.href.split('/').pop() as string;
+          const productionActivityId = valueRecord._links.productionActivity.href.split('/')[5];
+          const productionActivity = await getProductionActivityById(productionActivityId);
+          const organizationId = valueRecord._links.organization.href.split('/')[5];
+          const organization = await getOrganizationById(organizationId);
+          const metricId = valueRecord._links.metric.href.split('/')[5];
+          const metric = await getMetricById(metricId);
+          const lotId = valueRecord._links.lot.href.split('/')[5];
+          const lot = await getLotById(lotId);
+          return {
+            id,
+            value: valueRecord.value,
+            datetime: valueRecord.datetime,
+            validityDegree: valueRecord.validityDegree,
+            validityCategory: valueRecord.validityCategory,
+            lot: lot.reference,
+            organization: organization.name,
+            metric: metric.name,
+            productionActivity: productionActivity.name,
+          };
+        }));
+
+        tableData.value = IValueRecords;
       }
     };
 
@@ -282,12 +408,12 @@ export default defineComponent({
 
             if (selectedIds.value.length > 0){
               selectedIds.value.forEach((item) => {
-                ApiService.delete(`/value-record/${item}`);
+                ApiService.delete(`/valueRecords/${item}`);
                 tableData.value = tableData.value.filter((valueRecord) => valueRecord.id !== item.toString());
               });
               selectedIds.value.length = 0;
             }else{
-              ApiService.delete(`/value-record/${id}`);
+              ApiService.delete(`/valueRecords/${id}`);
               tableData.value = tableData.value.filter((valueRecord) => valueRecord.id !== id.toString());
             }
             Swal.fire("Deleted!", "Value record have been deleted.", "success");
@@ -355,6 +481,7 @@ export default defineComponent({
       totalItems,
       editValueRecord,
       valueRecord,
+      formatDateString
     };
   },
 });

@@ -33,7 +33,7 @@
       </div>
       <template v-else>
         <!--begin::sidebar mobile toggle-->
-        <div
+        <!-- <div
           class="d-flex align-items-center d-lg-none ms-n3 me-1 me-md-2"
           v-tooltip
           title="Show sidebar menu"
@@ -44,7 +44,7 @@
           >
             <KTIcon icon-name="abstract-14" icon-class="fs-2 fs-md-1" />
           </div>
-        </div>
+        </div> -->
         <!--end::sidebar mobile toggle-->
         <!--begin::Mobile logo-->
         <div class="d-flex align-items-center flex-grow-1 flex-lg-grow-0">

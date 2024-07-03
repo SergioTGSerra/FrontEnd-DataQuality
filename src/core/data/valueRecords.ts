@@ -5,8 +5,9 @@ interface IValueRecord {
   organizationId: string;
   datetime: any;
   validityDegree: number;
-  lotReference: string;
   validityCategory: string;
+  lotId: string;
+  value: number;
 }
 
 export type { IValueRecord };

@@ -14,7 +14,7 @@
             v-model="search"
             @input="searchItems()"
             class="form-control form-control-solid w-250px ps-15"
-            placeholder="Search Metrics"
+            placeholder="Search Production Activity"
           />
         </div> -->
         <!--end::Search-->
@@ -26,37 +26,37 @@
         <div
           v-if="selectedIds.length === 0"
           class="d-flex justify-content-end"
-          data-kt-metric-table-toolbar="base"
+          data-kt-typeOfMaterial-table-toolbar="base"
         >
           <!--begin::Export-->
           <!-- <button
             type="button"
             class="btn btn-light-primary me-3"
             data-bs-toggle="modal"
-            data-bs-target="#kt_metrics_export_modal"
+            data-bs-target="#kt_typeOfMaterials_export_modal"
           >
             <KTIcon icon-name="exit-up" icon-class="fs-2" />
             Export
           </button> -->
           <!--end::Export-->
-          <!--begin::Add metric-->
+          <!--begin::Add typeOfMaterial-->
           <button
             type="button"
             class="btn btn-primary"
             data-bs-toggle="modal"
-            data-bs-target="#kt_modal_add_metric"
+            data-bs-target="#kt_modal_add_typeOfMaterial"
           >
             <KTIcon icon-name="plus" icon-class="fs-2" />
-            {{ translate("addMetric")}}
+            Add Type Of Materials
           </button>
-          <!--end::Add metric-->
+          <!--end::Add typeOfMaterial-->
         </div>
         <!--end::Toolbar-->
         <!--begin::Group actions-->
         <div
           v-else
           class="d-flex justify-content-end align-items-center"
-          data-kt-metric-table-toolbar="selected"
+          data-kt-typeOfMaterial-table-toolbar="selected"
         >
           <div class="fw-bold me-5">
             <span class="me-2">{{ selectedIds.length }}</span
@@ -65,7 +65,7 @@
           <button
             type="button"
             class="btn btn-danger"
-            @click="deleteFewMetrics()"
+            @click="deleteFewTypeOfMaterials()"
           >
             Delete Selected
           </button>
@@ -74,19 +74,19 @@
         <!--begin::Group actions-->
         <div
           class="d-flex justify-content-end align-items-center d-none"
-          data-kt-metric-table-toolbar="selected"
+          data-kt-typeOfMaterial-table-toolbar="selected"
         >
           <div class="fw-bold me-5">
             <span
               class="me-2"
-              data-kt-metric-table-select="selected_count"
+              data-kt-typeOfMaterial-table-select="selected_count"
             ></span
             >Selected
           </div>
           <button
             type="button"
             class="btn btn-danger"
-            data-kt-metric-table-select="delete_selected"
+            data-kt-typeOfMaterial-table-select="delete_selected"
           >
             Delete Selected
           </button>
@@ -108,37 +108,31 @@
         checkbox-label="id"
         :totalItems="totalItems"
       >
-        <template v-slot:name="{ row: metric }">
-          {{ metric.name }}
+        <template v-slot:name="{ row }">
+          {{ row.name }}
         </template>
-        <template v-slot:description="{ row: metric }">
-          {{ metric.description }}
-        </template>
-        <template v-slot:unit="{ row: metric }">
-          {{ metric.unit }}
-        </template>
-        <template v-slot:actions="{ row: metric }"> 
+        <template v-slot:actions="{ row }">
           <!--begin::Edit-->
           <a
-              @click="editMetric(metric)"
-              href="#"
-              class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
-              data-bs-toggle="modal"
-              data-bs-target="#kt_modal_edit_metric"
-              title="Edit"
+            @click="editTypeOfMaterial(row)"
+            href="#"
+            class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
+            data-bs-toggle="modal"
+            data-bs-target="#kt_modal_edit_typeOfMaterial"
+            title="Edit"
+          >
+            <span
+              data-bs-toggle="tooltip"
+              data-bs-trigger="hover"
+              data-bs-original-title="Edit"
             >
-              <span
-                data-bs-toggle="tooltip"
-                data-bs-trigger="hover"
-                data-bs-original-title="Edit"
-              >
-                <KTIcon icon-name="pencil" icon-class="fs-3" />
-              </span>
+              <KTIcon icon-name="pencil" icon-class="fs-3" />
+            </span>
           </a>
           <!--end::Edit-->
           <!--begin::Delete-->
           <a
-            @click="deleteMetric(metric.id)"
+            @click="deleteTypeOfMaterial(row.id)"
             href="#"
             class="btn btn-icon btn-active-light-primary w-30px h-30px me-3"
             data-bs-toggle="tooltip"
@@ -147,128 +141,119 @@
           >
             <KTIcon icon-name="trash" icon-class="fs-3" />
           </a>
-          <!--end::Delete-->     
+          <!--end::Delete-->   
         </template>
       </Datatable>
     </div>
   </div>
 
-  <!-- <ExportMetricModal></ExportMetricModal> -->
-  <AddMetricModal :tableData="tableData"></AddMetricModal>
-  <EditMetricModal :metric="metric" :tableData="tableData"></EditMetricModal>
+  <!-- <ExportTypeOfMaterialModal></ExportTypeOfMaterialModal> -->
+  <AddTypeOfMaterialModal :tableData="tableData"></AddTypeOfMaterialModal>
+  <EditTypeOfMaterialModal :typeOfMaterial="typeOfMaterial" :tableData="tableData"></EditTypeOfMaterialModal>
 </template>
 
 <script lang="ts">
 import { defineComponent, onMounted, ref } from "vue";
 import Datatable from "@/components/kt-datatable/KTDataTable.vue";
 import type { Sort } from "@/components/kt-datatable//table-partials/models";
-// import ExportMetricModal from "@/components/modals/forms/ExportMetricModal.vue";
-import AddMetricModal from "@/views/apps/metrics/AddMetricModal.vue";
-import EditMetricModal from "./EditMetricModal.vue";
-import type { IMetric } from "@/core/data/metrics";
+// import ExportTypeOfMaterialModal from "@/components/modals/forms/ExportTypeOfMaterialModal.vue";
+import AddTypeOfMaterialModal from "./AddTypeOfMaterialModal.vue";
+import EditTypeOfMaterialModal from "./EditTypeOfMaterialModal.vue";
+import type { ITypeOfMaterial } from "@/core/data/typeOfMaterials";
 import arraySort from "array-sort";
 import { MenuComponent } from "@/assets/ts/components";
 import ApiService from "@/core/services/ApiService";
 import Swal from "sweetalert2";
 import { useAuthStore } from "@/stores/auth";
-import { useI18n } from "vue-i18n";
 
 const authStore = useAuthStore();
-const response = await ApiService.get("/metrics");
 
+const response = await ApiService.get("/typeOfMaterials");
 if(response.status === 401) authStore.refreshToken();
 
-const metrics = response.data._embedded.metrics;
-const totalItems = response.data.page.totalElements; 
+const typeOfMaterials = response.data._embedded.typeOfMaterials;
+const totalItems = response.data.page.totalElements;
 
-const IMetrics: IMetric[] = metrics.map(metric => {
-  const id = metric._links.self.href.split('/').pop() as string;
+const ITypeOfMaterials: ITypeOfMaterial[] = typeOfMaterials.map(typeOfMaterial => {
+  const id = typeOfMaterial._links.self.href.split('/').pop() as string;
   return {
     id,
-    name: metric.name,
-    description: metric.description,
-    unit: metric.unit
+    name: typeOfMaterial.name
   };
 });
 
 export default defineComponent({
-  name: "metrics-listing",
+  name: "typeOfMaterials-listing",
   components: {
-    Datatable,
-    AddMetricModal,
-    EditMetricModal,
+    Datatable,  
+    AddTypeOfMaterialModal,
+    EditTypeOfMaterialModal,
   },
   setup() {
-    const { t, te } = useI18n();
-
-    const translate = (text: string) => {
-      if (te(text)) {
-        return t(text);
-      } else {
-        return text;
-      }
-    };
-
     const tableHeader = ref([
       {
-        columnName: translate('name'),
+        columnName: "Name",
         columnLabel: "name",
         sortEnabled: true,
         columnWidth: 175,
       },
       {
-        columnName: translate('description'),
-        columnLabel: "description",
-        sortEnabled: true,
-        columnWidth: 230,
-      },
-      {
-        columnName: translate('unit'),
-        columnLabel: "unit",
-        sortEnabled: true,
-        columnWidth: 175,
-      },
-      {
-        columnName: translate('actions'),
+        columnName: "Actions",
         columnLabel: "actions",
         sortEnabled: false,
-        columnWidth: 135,
+        columnWidth: 100,
       },
     ]);
     const selectedIds = ref<Array<number>>([]);
-    const tableData = ref<Array<IMetric>>(IMetrics? IMetrics : []);
-    const metric = ref<Object>([]);
-    const initMetrics = ref<Array<IMetric>>([]);
+    const tableData = ref<Array<ITypeOfMaterial>>(ITypeOfMaterials? ITypeOfMaterials : []);
+    const typeOfMaterial = ref<Object>([]);
+    const initTypeOfMaterials = ref<Array<ITypeOfMaterial>>([]);
     let current_page = ref<number>(0);
     let items_per_page = ref<number>(10);
 
     onMounted(() => {
-      initMetrics.value.splice(0, tableData.value.length, ...tableData.value);
+      initTypeOfMaterials.value.splice(0, tableData.value.length, ...tableData.value);
     });
 
-    const getMetrics = async (current_page_param: number, items_per_page_param: number) => {
+    const editTypeOfMaterial = (TypeOfMaterialI: ITypeOfMaterial) => {
+      typeOfMaterial.value = TypeOfMaterialI;
+    };
+
+    const getTypeOfMaterials = async (current_page_param: number, items_per_page_param: number) => {
       if(items_per_page.value !== items_per_page_param){
-        const response = await ApiService.get("metrics?page=0&size=" + items_per_page_param);
-        tableData.value = response.data._embedded.metrics;
+        const response = await ApiService.get("typeOfMaterials?page=0&size=" + items_per_page_param);
+        const typeOfMaterials = response.data._embedded.typeOfMaterials;
+        const ITypeOfMaterials: ITypeOfMaterial[] = typeOfMaterials.map(typeOfMaterial => {
+          const id = typeOfMaterial._links.self.href.split('/').pop() as string;
+          return {
+            id,
+            name: typeOfMaterial.name
+          };
+        });
+        tableData.value = ITypeOfMaterials;
       }else{
-        const response = await ApiService.get("metrics?page=" + current_page_param + "&size=" + items_per_page_param);
-        tableData.value = response.data._embedded.metrics;
+        const response = await ApiService.get("typeOfMaterials?page=" + current_page_param + "&size=" + items_per_page_param);
+        const typeOfMaterials = response.data._embedded.typeOfMaterials;
+        const ITypeOfMaterials: ITypeOfMaterial[] = typeOfMaterials.map(typeOfMaterial => {
+          const id = typeOfMaterial._links.self.href.split('/').pop() as string;
+          return {
+            id,
+            name: typeOfMaterial.name
+          };
+        });
+        tableData.value = ITypeOfMaterials;
       }
     };
 
     const currentPage = (page: any) => {
       page = page - 1;
-      getMetrics(page, items_per_page.value);
+      getTypeOfMaterials(page, items_per_page.value);
       current_page.value = page;
     };
 
     const itemsPerPage = (items: any) => {
-      getMetrics(current_page.value, items);
+      getTypeOfMaterials(current_page.value, items);
       items_per_page.value = items;
-    };
-
-    const editMetric = (metricI: IMetric) => {
-      metric.value = metricI;
     };
 
     const deleteModalConfirmation = (id?: any) => {
@@ -288,34 +273,34 @@ export default defineComponent({
 
             if (selectedIds.value.length > 0){
               selectedIds.value.forEach((item) => {
-                ApiService.delete(`/metrics/${item}`);
-                tableData.value = tableData.value.filter((metric) => metric.id !== item.toString());
+                ApiService.delete(`/typeOfMaterials/${item}`);
+                tableData.value = tableData.value.filter((typeOfMaterial) => typeOfMaterial.id !== item.toString());
               });
               selectedIds.value.length = 0;
             }else{
-              ApiService.delete(`/metrics/${id}`);
-              tableData.value = tableData.value.filter((metric) => metric.id !== id.toString());
+              ApiService.delete(`/typeOfMaterials/${id}`);
+              tableData.value = tableData.value.filter((typeOfMaterial) => typeOfMaterial.id !== id.toString());
             }
-            Swal.fire("Deleted!", "Metric have been deleted.", "success");
+            Swal.fire("Deleted!", "Type Of Material have been deleted.", "success");
           } else if (result.dismiss === Swal.DismissReason.cancel) {
-            Swal.fire("Cancelled", "Your metrics are safe :)", "error");
+            Swal.fire("Cancelled", "Your Type Of Materials are safe :)", "error");
           }
         });
     }
 
-    const deleteFewMetrics = () => {
+    const deleteFewTypeOfMaterials = () => {
       deleteModalConfirmation();
     };
 
-    const deleteMetric = (id: number) => {
+    const deleteTypeOfMaterial = (id: number) => {
       deleteModalConfirmation(id);
     };
 
     // const search = ref<string>("");
     // const searchItems = () => {
-    //   tableData.value.splice(0, tableData.value.length, ...initMetrics.value);
+    //   tableData.value.splice(0, tableData.value.length, ...initTypeOfMaterials.value);
     //   if (search.value !== "") {
-    //     let results: Array<IMetric> = [];
+    //     let results: Array<ITypeOfMaterial> = [];
     //     for (let j = 0; j < tableData.value.length; j++) {
     //       if (searchingFunc(tableData.value[j], search.value)) {
     //         results.push(tableData.value[j]);
@@ -351,18 +336,16 @@ export default defineComponent({
     return {
       tableData,
       tableHeader,
-      deleteMetric,
+      deleteTypeOfMaterial,
       selectedIds,
-      deleteFewMetrics,
+      deleteFewTypeOfMaterials,
       sort,
       onItemSelect,
-      editMetric,
-      metric,
+      editTypeOfMaterial,
+      typeOfMaterial,
       currentPage,
       itemsPerPage,
       totalItems,
-      initMetrics,
-      translate
     };
   },
 });

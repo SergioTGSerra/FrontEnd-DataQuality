@@ -305,13 +305,13 @@ export default defineComponent({
             loading.value = false;
 
             (async () => {
-              const response = await ApiService.put("/organization/" + organizationID, formData.value);
+              const response = await ApiService.put("/organizations/" + organizationID, formData.value);
 
               if (response.data.status === "fail")  fail(response.data.data);
               else if(response.data.status === "error") error(response.data.message);
-              else if (response.data.status === "success"){
+              else if (response.status === 200){
                 success("Organization updated with success!", editOrganizationModalRef.value);
-                updateOrganization(response.data.data);
+                updateOrganization(response.data);
               }else{
                 error("Something went wrong, please try again later.", editOrganizationModalRef.value);
               }

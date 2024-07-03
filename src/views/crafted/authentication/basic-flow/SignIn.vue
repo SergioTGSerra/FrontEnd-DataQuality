@@ -16,13 +16,13 @@
         <!--end::Title-->
 
         <!--begin::Link-->
-        <div class="text-gray-500 fw-semibold fs-4">
+        <!-- <div class="text-gray-500 fw-semibold fs-4">
           New Here?
 
           <router-link to="/sign-up" class="link-primary fw-bold">
             Create an Account
           </router-link>
-        </div>
+        </div> -->
         <!--end::Link-->
       </div>
       <!--begin::Heading-->

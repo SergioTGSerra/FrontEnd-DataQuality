@@ -1,24 +1,24 @@
 <template>
   <div
     class="modal fade"
-    id="kt_modal_edit_metric"
-    ref="editMetricModalRef"
+    id="kt_modal_add_lot"
+    ref="addLotModalRef"
     tabindex="-1"
     aria-hidden="true"
-      > 
+  >
     <!--begin::Modal dialog-->
     <div class="modal-dialog modal-dialog-centered mw-650px">
       <!--begin::Modal content-->
       <div class="modal-content">
         <!--begin::Modal header-->
-        <div class="modal-header" id="kt_modal_edit_metric_header">
+        <div class="modal-header" id="kt_modal_add_lot_header">
           <!--begin::Modal title-->
-          <h2 class="fw-bold">{{ translate('editMetric') }}</h2>
+          <h2 class="fw-bold">Add a Lot</h2>
           <!--end::Modal title-->
 
           <!--begin::Close-->
           <div
-            id="kt_modal_edit_metric_close"
+            id="kt_modal_add_lot_close"
             data-bs-dismiss="modal"
             class="btn btn-icon btn-sm btn-active-icon-primary"
           >
@@ -39,24 +39,24 @@
             <!--begin::Scroll-->
             <div
               class="scroll-y me-n7 pe-7"
-              id="kt_modal_edit_metric_scroll"
+              id="kt_modal_add_lot_scroll"
               data-kt-scroll="true"
               data-kt-scroll-activate="{default: false, lg: true}"
               data-kt-scroll-max-height="auto"
-              data-kt-scroll-dependencies="#kt_modal_edit_metric_header"
-              data-kt-scroll-wrappers="#kt_modal_edit_metric_scroll"
+              data-kt-scroll-dependencies="#kt_modal_add_lot_header"
+              data-kt-scroll-wrappers="#kt_modal_add_lot_scroll"
               data-kt-scroll-offset="300px"
             >
               <!--begin::Input group-->
               <div class="fv-row mb-7">
                 <!--begin::Label-->
-                <label class="required fs-6 fw-semibold mb-2">{{ translate('name') }}</label>
+                <label class="required fs-6 fw-semibold mb-2">Reference</label>
                 <!--end::Label-->
 
                 <!--begin::Input-->
-                <el-form-item prop="name">
+                <el-form-item prop="reference">
                   <el-input
-                    v-model="formData.name"
+                    v-model="formData.reference"
                     type="text"
                     placeholder=""
                   />
@@ -68,13 +68,13 @@
               <!--begin::Input group-->
               <div class="fv-row mb-7">
                 <!--begin::Label-->
-                <label class="required fs-6 fw-semibold mb-2">{{ translate('description') }}</label>
+                <label class="required fs-6 fw-semibold mb-2">Produced Quantity</label>
                 <!--end::Label-->
 
                 <!--begin::Input-->
-                <el-form-item prop="description">
+                <el-form-item prop="producedQuantity">
                   <el-input
-                    v-model="formData.description"
+                    v-model="formData.producedQuantity"
                     type="text"
                     placeholder=""
                   />
@@ -86,24 +86,28 @@
               <!--begin::Input group-->
               <div class="fv-row mb-7">
                 <!--begin::Label-->
-                <label class="required fs-6 fw-semibold mb-2">{{ translate('unit') }}</label>
+                <label class="required fs-6 fw-semibold mb-2">Production Activity</label>
                 <!--end::Label-->
 
                 <!--begin::Input-->
-                <el-form-item prop="Unit">
-                  <el-input
-                    v-model="formData.unit"
-                    type="text"
-                    placeholder=""
-                  />
+                <el-form-item prop="productionActivity">
+                  <el-select
+                    v-model="formData.productionActivity"
+                    placeholder="Select production activity"
+                  >
+                    <el-option
+                      v-for="productionActivity in IProductionActivities"
+                      :key="productionActivity.id"
+                      :label="productionActivity.name"
+                      :value="productionActivity.id"
+                    />
+                  </el-select>
                 </el-form-item>
                 <!--end::Input-->
-              </div>
-              <!--end::Input group-->
-
               
             </div>
             <!--end::Scroll-->
+            </div>
           </div>
           <!--end::Modal body-->
 
@@ -112,10 +116,10 @@
             <!--begin::Button-->
             <button
               type="reset"
-              id="kt_modal_edit_metric_cancel"
+              id="kt_modal_add_lot_cancel"
               class="btn btn-light me-3"
             >
-            {{ translate('discard') }}
+              Discard
             </button>
             <!--end::Button-->
 
@@ -126,11 +130,11 @@
               type="submit"
             >
               <span v-if="!loading" class="indicator-label">
-                {{ translate('submit') }}
+                Submit
                 <KTIcon icon-name="arrow-right" icon-class="fs-2 me-2 me-0" />
               </span>
               <span v-if="loading" class="indicator-progress">
-                {{ translate('pleaseWait') }}
+                Please wait...
                 <span
                   class="spinner-border spinner-border-sm align-middle ms-2"
                 ></span>
@@ -147,88 +151,71 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch } from "vue";
+import { defineComponent, ref } from "vue";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import ApiService from "@/core/services/ApiService";
 import { success, fail, error } from "@/core/helpers/alertModal";
-import { useI18n } from "vue-i18n";
+
+const response = await ApiService.get("/productionActivities");
+const productionActivities = response.data._embedded.productionActivities;
+
+const IProductionActivities: any = productionActivities.map(productionActivity => {
+  const id = productionActivity._links.self.href.split('/').pop() as string;
+  return {
+    id,
+    name: productionActivity.name
+  };
+});
 
 export default defineComponent({
-  name: "edit-metric-modal",
-  props: ['metric', 'tableData'],
+  name: "add-lot-modal",
   components: {},
+  props: {
+    tableData: Array,
+  },
   setup(props) {
-    const { t, te } = useI18n();
-
-    const translate = (text: string) => {
-      if (te(text)) {
-        return t(text);
-      } else {
-        return text;
-      }
-    };
     const formRef = ref<null | HTMLFormElement>(null);
-    const editMetricModalRef = ref<null | HTMLElement>(null);
+    const addLotModalRef = ref<null | HTMLElement>(null);
     const loading = ref<boolean>(false);
-    let metricID = ref<String>('');
-
     const formData = ref({
-      name: "",
-      description: "",
-      unit: "",
-    });
-
-    watch(() => props.metric, (editMetric) => {
-      if (editMetric) {
-        formData.value = {
-          name: editMetric.name,
-          description: editMetric.description,
-          unit: editMetric.unit,
-        };
-      metricID = editMetric.id;
-      }
+      reference: "",
+      producedQuantity: "",
+      productionActivity: "",
     });
 
     const rules = ref({
-      name: [
-        {
-          required: true,
-          message: "Metric name is required",
-          trigger: "change",
-        },
-        {
-          min: 2,
-          message: "Metric name must be at least 2 characters",
-          trigger: "change",
-        }
+      reference: [
+        { required: true, message: "Reference is required", trigger: "blur" },
       ],
-      description: [
-        {
-          required: true,
-          message: "Metric description is required",
-          trigger: "change",
-        },
-        {
-          min: 2,
-          message: "Metric description must be at least 2 characters",
-          trigger: "change",
-        }
+      producedQuantity: [
+        { required: true, message: "Produced Quantity is required", trigger: "blur" },
       ],
-      unit: [
-        {
-          required: true,
-          message: "Metric unit is required",
-          trigger: "change",
-        },
+      productionActivity: [
+        { required: true, message: "Please select production activity", trigger: "change" },
       ],
     });
 
-    const updateMetric = (metric) => {
-      const index = props.tableData.findIndex((item: any) => item.id === metricID);
-      
-      if (index !== -1) {
-        props.tableData[index] = metric;
+    const getProductionActivityById = async (id: string) => {
+      try {
+        const response = await ApiService.get(`/lots`, id + `/productionActivity`);
+        return response.data;
+      } catch (error) {
+        console.error(`Erro ao carregar o nome do lote: ${error}`);
+        return null;
       }
+    };
+
+    const convertToILot = async (lot: any) => {
+      const id = lot._links.self.href.split('/').pop() as string;
+      const productionActivityId = lot._links.productionActivity.href.split('/')[5];
+      const productionActivity = await getProductionActivityById(productionActivityId);
+      return {
+        id,
+        reference: lot.reference,
+        producedQuantity: lot.producedQuantity,
+        productionActivityId: productionActivityId ? productionActivityId : "",
+        productionActivityName: productionActivity.name ? productionActivity.name : "",
+      };
     };
 
     const submit = () => {
@@ -244,21 +231,21 @@ export default defineComponent({
             loading.value = false;
 
             (async () => {
-              const response = await ApiService.put("/metrics/" + metricID, formData.value);
-
+              const data = {
+                reference: formData.value.reference,
+                producedQuantity: formData.value.producedQuantity,
+                productionActivity: "http://api.med1.ipvc.bioeconomy-at-textiles.com/v1/productionActivities/" + formData.value.productionActivity,
+              };
+              
+              const response = await ApiService.post("/lots", data);
+            
               if (response.data.status === "fail")  fail(response.data.data);
               else if(response.data.status === "error") error(response.data.message);
-              else if (response.status === 200){
-                const data = {
-                  id: response.data._links.self.href.split("/").pop(),
-                  name: response.data.name,
-                  description: response.data.description,
-                  unit: response.data.unit,
-                };
-                success("Metric updated with success!", editMetricModalRef.value);
-                updateMetric(data);
-              }else {
-                error("Something went wrong, please try again later.", editMetricModalRef.value);
+              else if(response.status === 201){
+                success("Lot created with success!", addLotModalRef.value);
+                props.tableData?.push(await convertToILot(response.data));
+              }else{
+                error("Something went wrong, please try again later.", addLotModalRef.value);
               }
             })();
           }, 2000);
@@ -284,8 +271,8 @@ export default defineComponent({
       submit,
       formRef,
       loading,
-      editMetricModalRef,
-      translate,
+      addLotModalRef,
+      IProductionActivities
     };
   },
 });

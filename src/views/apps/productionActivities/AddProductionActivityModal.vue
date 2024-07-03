@@ -64,24 +64,6 @@
                 <!--end::Input-->
               </div>
               <!--end::Input group-->
-
-              <!--begin::Input group-->
-              <div class="fv-row mb-7">
-                <!--begin::Label-->
-                <label class="required fs-6 fw-semibold mb-2">Reference</label>
-                <!--end::Label-->
-
-                <!--begin::Input-->
-                <el-form-item prop="reference">
-                  <el-input
-                    v-model="formData.reference"
-                    type="text"
-                    placeholder=""
-                  />
-                </el-form-item>
-                <!--end::Input-->
-              </div>
-              <!--end::Input group-->
             </div>
             <!--end::Scroll-->
           </div>
@@ -144,7 +126,6 @@ export default defineComponent({
     const loading = ref<boolean>(false);
     const formData = ref({
       name: "",
-      reference: "",
     });
 
     const rules = ref({
@@ -157,18 +138,6 @@ export default defineComponent({
         {
           min: 2,
           message: "Production Activity name must be at least 2 characters",
-          trigger: "change",
-        },
-      ],
-      reference: [
-        {
-          required: true,
-          message: "Reference is required",
-          trigger: "change",
-        },
-        {
-          min: 2,
-          message: "Reference must be at least 2 characters",
           trigger: "change",
         },
       ],
@@ -187,13 +156,17 @@ export default defineComponent({
             loading.value = false;
 
             (async () => {
-              const response = await ApiService.post("/production-activity", formData.value);
+              const response = await ApiService.post("/productionActivities", formData.value);
             
               if (response.data.status === "fail")  fail(response.data.data);
               else if(response.data.status === "error") error(response.data.message);
-              else if (response.data.status === "success"){
+              else if (response.status === 201){
+                const data = {
+                  id: response.data._links.self.href.split("/").pop(),
+                  name: response.data.name
+                };
                 success("Production activity created with success!", addProductionActivityModalRef.value);
-                props.tableData?.push(response.data.data);
+                props.tableData?.push(data);
               }else{
                 error("Something went wrong, please try again.", addProductionActivityModalRef.value);
               }

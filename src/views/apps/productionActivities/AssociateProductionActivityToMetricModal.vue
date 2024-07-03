@@ -57,7 +57,7 @@
                 <el-form-item prop="metricId">
                   <el-select v-model="formData.metricId" placeholder="Select metric">
                     <el-option
-                      v-for="metric in metrics"
+                      v-for="metric in IMetrics"
                       :key="metric.id"
                       :label="metric.name"
                       :value="metric.id"
@@ -251,9 +251,20 @@ import ApiService from "@/core/services/ApiService";
 import { validationFormulas } from "@/core/data/validationFormulas";
 import { success, fail, error } from "@/core/helpers/alertModal";
 import { validateMinDeg } from "@/core/helpers/validator";
+import type { IMetric } from "@/core/data/metrics";
 
-const response = await ApiService.get("/metric");
-const metrics = response.data.data;
+const response = await ApiService.get("/metrics");
+const metrics = response.data._embedded.metrics;
+
+const IMetrics: IMetric[] = metrics.map(metric => {
+  const id = metric._links.self.href.split('/').pop() as string;
+  return {
+    id,
+    name: metric.name,
+    description: metric.description,
+    unit: metric.unit
+  };
+});
 
 export default defineComponent({
   name: "associate-productionActivity-modal",
@@ -299,13 +310,27 @@ export default defineComponent({
             loading.value = false;
 
             (async () => {
-              const response = await ApiService.post("/production-activity-metric", formData.value);
+              const data = {
+                id: {
+                  productionActivity: "http://api.med1.ipvc.bioeconomy-at-textiles.com/v1/productionActivities/" + props.productionActivityId,
+                  metric: "http://api.med1.ipvc.bioeconomy-at-textiles.com/v1/metrics/" + formData.value.metricId
+                },
+                min: formData.value.min.toString(),
+                max: formData.value.max.toString(),
+                mean: formData.value.mean.toString(),
+                k: formData.value.k.toString(),
+                minDegValid: formData.value.minDegValid.toString(),
+                minDegSuspect: formData.value.minDegSuspect.toString(),
+                validationFormula: formData.value.validationFormula,
+              };
+
+              const response = await ApiService.post("/productionActivityMetrics", data);
             
               if (response.data.status === "fail")  fail(response.data.data);
               else if(response.data.status === "error") error(response.data.message);
-              else if (response.data.status === "success"){
+              else if (response.status === 200){
                 success("The metric was associated with success!", associateProductionActivityModalRef.value);
-                props.tableData?.push(response.data.data);
+                props.tableData?.push(response.data);
               }else{
                 error("Something went wrong, please try again.", associateProductionActivityModalRef.value);
               }
@@ -336,6 +361,7 @@ export default defineComponent({
       associateProductionActivityModalRef,
       validationFormulas,
       metrics,
+      IMetrics
     };
   },
 });
