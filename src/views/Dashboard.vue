@@ -9,6 +9,7 @@
         icon-color="white"
         :title="totalLots"
         :description="translate('lots')"
+        :link="'/lots'"
       ></StatisticsWidget5>
     </div>
 
@@ -20,6 +21,7 @@
         icon-color="white"
         :title="totalValueRecords"
         :description="translate('valueRecords')"
+        :link="'/valueRecords'"
       ></StatisticsWidget5>
     </div>
       <div v-if="User.username === 'admin'" class="col-xl-3">
@@ -30,6 +32,7 @@
           icon-color="white"
           :title="totalMetrics"
           :description="translate('metrics')"
+          :link="'/metrics'"
         ></StatisticsWidget5>
       </div>
 
@@ -41,6 +44,7 @@
           icon-color="white"
           :title="totalOrganizations"
           :description="translate('organizations')"
+          :link="'/organizations'"
         ></StatisticsWidget5>
       </div>
   </div>
