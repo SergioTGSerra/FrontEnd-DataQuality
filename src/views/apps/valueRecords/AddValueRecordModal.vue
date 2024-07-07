@@ -299,6 +299,7 @@ const convertToIValueRecord = async (valueRecord: any): Promise<any> => {
   return {
     id,
     value: valueRecord.value,
+    datetime: valueRecord.datetime,
     validityDegree: valueRecord.validityDegree,
     validityCategory: valueRecord.validityCategory,
     lot: lot.reference,
