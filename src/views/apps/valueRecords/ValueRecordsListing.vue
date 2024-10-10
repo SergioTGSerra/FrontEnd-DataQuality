@@ -115,7 +115,7 @@
           {{ formatDateString(valueRecord.datetime) }}
         </template>
         <template v-slot:validityDegree="{ row: valueRecord }">
-            {{ valueRecord.validityDegree.toFixed(2)*100 }}%
+            {{ valueRecord.validityDegree.toFixed(2) }}%
         </template>
         <template v-slot:validityCategory="{ row: valueRecord }">
           {{ valueRecord.validityCategory }}
@@ -266,7 +266,7 @@ export default defineComponent({
         columnName: "Validity Degree",
         columnLabel: "validityDegree",
         sortEnabled: true,
-        columnWidth: 130,
+        columnWidth: 140,
       },
       {
         columnName: "Validity Category",

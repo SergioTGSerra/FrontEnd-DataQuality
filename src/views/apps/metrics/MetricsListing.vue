@@ -191,6 +191,18 @@ const IMetrics: IMetric[] = metrics.map(metric => {
   };
 });
 
+function transformMetrics(metrics: any): IMetric[] {
+  return metrics.map(metric => {
+    const id = metric._links.self.href.split('/').pop() as string;
+    return {
+      id,
+      name: metric.name,
+      description: metric.description,
+      unit: metric.unit
+    };
+  });
+}
+
 export default defineComponent({
   name: "metrics-listing",
   components: {
@@ -249,10 +261,13 @@ export default defineComponent({
     const getMetrics = async (current_page_param: number, items_per_page_param: number) => {
       if(items_per_page.value !== items_per_page_param){
         const response = await ApiService.get("metrics?page=0&size=" + items_per_page_param);
-        tableData.value = response.data._embedded.metrics;
+        const metrics = response.data._embedded.metrics;
+        tableData.value = transformMetrics(metrics);
+
       }else{
         const response = await ApiService.get("metrics?page=" + current_page_param + "&size=" + items_per_page_param);
-        tableData.value = response.data._embedded.metrics;
+        const metrics = response.data._embedded.metrics;
+        tableData.value = transformMetrics(metrics);
       }
     };
 
